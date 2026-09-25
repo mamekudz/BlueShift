@@ -1,5 +1,6 @@
 #include "app/application.h"
 
+#include "bluetooth/bluetooth_platform.h"
 #include "blueshift/log.h"
 #include "blueshift/version.h"
 #include "diagnostics/diag_export.h"
@@ -149,11 +150,20 @@ void Application::bootBattery() {
 }
 
 void Application::bootBluetooth() {
+#if defined(BLUESHIFT_BOARD_T_LION) || defined(BLUESHIFT_ENABLE_ESP_IDF_BT)
+    auto &plat = BluetoothPlatform::instance();
+    (void)plat.initializeDualMode();
+    BS_LOG_INFO("BOOT", "BT platform status detail=%s", plat.statusDetail());
+#else
+    BS_LOG_INFO("BOOT", "BT platform deferred (enable T-Lion or BLUESHIFT_ENABLE_ESP_IDF_BT)");
+#endif
     classic_.setRawCallback(onClassicRaw, this);
     classicOk_ = classic_.start();
     bleOk_ = ble_.start();
-    BS_LOG_INFO("BT-CLASSIC", "spike start=%s", classicOk_ ? "ok" : "fail");
-    BS_LOG_INFO("BLE", "spike start=%s", bleOk_ ? "ok" : "fail");
+    BS_LOG_INFO("BT-CLASSIC", "EspIdfClassicHidHost start=%s api=%s", classicOk_ ? "ok" : "fail",
+                classic_.hardwareApiPresent() ? "yes" : "no");
+    BS_LOG_INFO("BLE", "EspIdfBleHidPeripheral start=%s api=%s", bleOk_ ? "ok" : "fail",
+                ble_.hardwareApiPresent() ? "yes" : "no");
 }
 
 void Application::bootUi() {

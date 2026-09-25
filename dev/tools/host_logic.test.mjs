@@ -274,6 +274,23 @@ test("M3 components present", () => {
   }
 });
 
+test("M4 ESP-IDF BT adapters present", () => {
+  const need = [
+    "components/bluetooth/bluetooth_platform.cpp",
+    "components/bluetooth/esp_idf_classic_hid_host.cpp",
+    "components/bluetooth/esp_idf_ble_hid_peripheral.cpp",
+    "docs/licensing/bluetooth-stack-matrix.md",
+    "docs/bluetooth/esp-idf-dual-mode.md",
+  ];
+  for (const rel of need) {
+    assert.ok(existsSync(join(ROOT, rel)), rel);
+  }
+  const matrix = readFileSync(join(ROOT, "docs/licensing/bluetooth-stack-matrix.md"), "utf8");
+  assert.match(matrix, /BTstack/);
+  assert.match(matrix, /\*\*GREEN\*\*/);
+  assert.match(matrix, /BTstack required\?\*\* \*\*No/i);
+});
+
 test("version is 0.3.0-dev", () => {
   const ver = readFileSync(join(ROOT, "include/blueshift/version.h"), "utf8");
   assert.match(ver, /0\.3\.0-dev/);

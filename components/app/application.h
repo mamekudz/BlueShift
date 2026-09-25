@@ -4,6 +4,8 @@
 #include "battery/battery_monitor.h"
 #include "bluetooth/ble_hid_peripheral.h"
 #include "bluetooth/classic_hid_host.h"
+#include "bluetooth/esp_idf_ble_hid_peripheral.h"
+#include "bluetooth/esp_idf_classic_hid_host.h"
 #include "bridge/bridge_core.h"
 #include "display/display.h"
 #include "display/framebuffer_display.h"
@@ -33,10 +35,10 @@ public:
     UiController &ui() {
         return ui_;
     }
-    ClassicHidHostSpike &classic() {
+    EspIdfClassicHidHost &classic() {
         return classic_;
     }
-    BleHidPeripheralSpike &ble() {
+    EspIdfBleHidPeripheral &ble() {
         return ble_;
     }
     ConfigStore &configStore() {
@@ -65,8 +67,8 @@ private:
     UiRenderModel renderModel_{};
     NavigationInput nav_{};
     OledPowerManager oledPower_{};
-    ClassicHidHostSpike classic_{};
-    BleHidPeripheralSpike ble_{};
+    EspIdfClassicHidHost classic_{};
+    EspIdfBleHidPeripheral ble_{};
     BatteryMonitor batteryMon_{};
     BatteryStatus batteryStatus_{};
     FramebufferDisplay fbDisplay_{};
