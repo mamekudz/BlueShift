@@ -29,13 +29,27 @@ enum class BlueshiftMsgId : uint16_t {
     LabelCriticalBattery = 18,
     ConfirmFactoryReset = 19,
     Cancel = 20,
-    MsgCount = 21
+    HintNavBack = 21,
+    HintConfirm = 22,
+    ProfileKeyboard = 23,
+    ProfileGamepad = 24,
+    DiagOled = 25,
+    DiagButtons = 26,
+    DiagBattery = 27,
+    DiagClassicScan = 28,
+    DiagClassic = 29,
+    DiagBle = 30,
+    DiagBridge = 31,
+    DiagReconnect = 32,
+    StatusInputLost = 33,
+    StatusOutputLost = 34,
+    SelfTest = 35,
+    MsgCount = 36
 };
 
 void i18nSetLocale(BlueshiftLocale locale);
 BlueshiftLocale i18nGetLocale();
 const char *i18nMsg(BlueshiftMsgId id);
 
-// Validation helpers (host tests).
 bool i18nHasFallback(BlueshiftMsgId id);
 unsigned i18nMessageCount();

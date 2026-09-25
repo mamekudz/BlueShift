@@ -75,6 +75,10 @@ ClassicHidHost (interface)     BleHidPeripheral (interface)
 
 Concrete stacks stay behind adapters. BridgeCore / HID models / queues are host-testable without radio.
 
+## Milestone 3 interim decision
+
+See [`m3-stack-decision.md`](m3-stack-decision.md): Classic/BLE **spikes** compile; dual-radio stack **not** default-linked on espressif32 6.9.0 / Arduino 2.x.
+
 ## Recommended next physical experiments (when board arrives)
 
 1. Bring-up OLED + 5-way + battery ADC (no BT).

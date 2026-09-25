@@ -13,10 +13,10 @@ is the final logo.
 | `docs/assets/blueshift-oled-mono.png` | Preview (future) |
 | `src` / generated header | 128×64 (or cropped) 1-bit bitmap for SSD1306 |
 
-## Conversion path (planned)
+## Conversion path
 
-1. Author exports mono SVG/PNG at OLED-friendly size.
-2. Gulp/Python tool converts to `XBM` / `uint8_t` page-packed SSD1306 buffer.
-3. Firmware `Display` draws the bitmap on boot/about.
+1. Author exports mono SVG → PNG or binary **PBM P4** at OLED-friendly size (e.g. 32×16 or 64×32).
+2. Run `node dev/tools/oled-mono-convert.mjs <file.pbm>` → `components/ui/oled_logo_generated.h`.
+3. Firmware draws via `Display::drawBitmap` (About/boot).
 
-Temporary placeholder for layout tests: empty slot — UI uses text wordmark via i18x.
+Temporary placeholder: `components/ui/oled_logo_placeholder.h` — **not** the final logo.

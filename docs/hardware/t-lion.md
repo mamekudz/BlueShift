@@ -91,6 +91,16 @@ Active level: example uses Button2 default (typically active-low with pull-up) �
 
 **Note:** GPIO 34/35/36/39 are input-only on ESP32 — DOCUMENTED (Espressif). Suitable for buttons/ADC, not outputs.
 
+### Electrical assumptions (firmware)
+
+| Pins | Pull-up policy | Label |
+| --- | --- | --- |
+| GPIO32 / GPIO33 | `INPUT_PULLUP` allowed (internal OK) | ASSUMED board also has resistors |
+| GPIO34 / GPIO36 / GPIO39 | `INPUT` only — **no** internal pull-up | DOCUMENTED ESP32 limitation; board must provide resistors |
+| Active level | Active-low | ASSUMED (Button2 / LilyGO example) |
+
+Firmware: `components/input/gpio_navigation.cpp`. Do not enable unsupported internal pulls on input-only pins.
+
 ---
 
 ## LEDs

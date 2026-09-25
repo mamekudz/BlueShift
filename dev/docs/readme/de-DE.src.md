@@ -24,7 +24,7 @@ website-Blöcke können später ergänzt werden; unmarked Text erscheint in der 
 
 Paket-/Repo-Identifier (ASCII): `blueshift` — sichtbarer Projektname bleibt **BlueShift**.
 
-**Status:** Milestone 2 — Research + Pre-Implementation. Architektur, Host-Tests und dokumentierte T-Lion-Pinannahmen sind vorbereitet. Physische Hardware ist **noch nicht** verfügbar — daher **nichts physisch VERIFIED**.
+**Status:** Milestone 3 — maximale Vorab-Implementierung (`0.3.0-dev`). Board-Layer, SSD1306-Backend, OLED-UI, Nav/ADC, NVS, Factory-Reset, Classic/BLE-Spikes, Bridge-Simulation und Host-Tests sind **IMPLEMENTED_UNVERIFIED**. Physische Hardware ist **noch nicht** verfügbar — daher **nichts physisch VERIFIED**.
 
 Dieses Repository ist **µGulp-ready** (Gulp-Tasks für Dokumentation, Formatierung und Backup; siehe [Entwicklung](#entwicklung)).
 
@@ -84,29 +84,38 @@ PlatformIO: `skeleton` (esp32dev smoke) + `t-lion-debug` / `t-lion-release` (cus
 
 ---
 
-## Architektur (IMPLEMENTED_UNVERIFIED / PLANNED)
+## Architektur (IMPLEMENTED_UNVERIFIED)
 
 ```
-Classic HID Report
-      |
-  Device Parser / Profile
-      |
- Normalized HID State
-      |
-  Output Mapper
-      |
-  BLE HID Report
+Classic HID Device
+        |
+ClassicHidHostSpike (stub / mock; Radio später)
+        |
+   Raw HID Report
+        |
+ Device Parser / Profile
+        |
+ Normalized Input
+        |
+    BridgeCore
+        |
+ BLE report builder / BleHidPeripheralSpike
+        |
+   BLE-only Host
 ```
 
-Vorbereitet in `components/` (Host-Tests ohne Hardware):
+In `components/` (Host-Tests ohne Radio):
 
-- Normalized HID + BLE Report-Builder
-- `BridgeCore` FSM + bounded queues + Disconnect-Policy
-- Navigation (5-Wege Debounce/Long-Press), UI-Screens, Battery-Modell, Power-Policy
-- i18x en-US/de-DE für OLED-Strings
-- BT-Interfaces (`ClassicHidHost` / `BleHidPeripheral`) — noch **ohne** Stack-`lib_deps`
+- Board-Facade T-Lion (keine App-GPIO-Hardcodes)
+- SSD1306 via ThingPulse (nur `t-lion-*`) + Framebuffer für Host/Skeleton
+- OLED-UI-Renderer (Status/Pair/Devices/Profiles/Diagnostics/Settings/About)
+- GPIO-Nav + ADC-Battery-Backends (DOCUMENTED Pins)
+- NVS `ConfigStore` + Factory-Reset-Orchestrierung
+- Classic/BLE-Spikes mit Timeouts; Dual-Radio bewusst **nicht** default-linked
+- E2E-Simulation, Stuck-Key-/Disconnect-/Malformed-HID-Tests
+- i18x en-US/de-DE für alle aktuellen UI-Strings
 
-Bluetooth-Recherche: [`docs/bluetooth/stack-architecture.md`](docs/bluetooth/stack-architecture.md) — Research-Lead **EspBle Dual-Host / ESP32KeyBridge-Muster**; Bluepad32 als Alternative.
+Stack-Entscheidung: [`docs/bluetooth/m3-stack-decision.md`](docs/bluetooth/m3-stack-decision.md).
 
 ---
 
