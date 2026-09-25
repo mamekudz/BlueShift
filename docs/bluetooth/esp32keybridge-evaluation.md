@@ -44,6 +44,10 @@ BlueShift may:
 
 BlueShift must **not** silently fork large unmarked copies. Any incorporation goes through `THIRD_PARTY_LICENSES.md`.
 
+**Audit (2026-09-25):** Upstream LICENSE is **MIT** (© 2026 TANAKA Masayuki).
+Tree check at `b9d3506`: **no ESP32KeyBridge source files copied or adapted** —
+reference/research only. See `docs/licensing/license-audit.md`.
+
 ## Recommendation
 
 Treat ESP32KeyBridge + EspBle as the **primary researched architecture candidate** for Milestone 2/3 stack selection, with BlueShift-owned `ClassicHidHost` / `BleHidPeripheral` / `BridgeCore` interfaces wrapping whatever concrete stack is chosen after physical experiments.

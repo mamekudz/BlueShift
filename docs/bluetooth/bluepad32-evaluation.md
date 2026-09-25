@@ -32,10 +32,20 @@ That is substantial custom BTstack work (GATT HID service, descriptors, bonding)
 
 ## Licensing
 
-Bluepad32 and its BTstack dependency have their own licenses. Before incorporation:
+Bluepad32 itself is **Apache-2.0** (upstream `LICENSE`, © Ricardo Quesada).
 
-- record exact versions and licenses in `THIRD_PARTY_LICENSES.md`;
-- verify compatibility with BlueShift’s open-source licensing.
+It **depends on BTstack** (BlueKitchen). Upstream notice: BTstack has a
+commercial license and is described as free for open-source projects; for
+ESP32 commercial products Bluepad32 docs direct users to contact BlueKitchen.
+
+**BlueShift status:** researched only — **not** a dependency, **not** vendored,
+**not** linked. See `docs/licensing/license-audit.md`.
+
+Before any incorporation:
+
+- pin exact Bluepad32 + BTstack versions;
+- record notices in `THIRD_PARTY_LICENSES.md`;
+- obtain BlueKitchen commercial terms if shipping commercial/closed products.
 
 ## Recommendation
 

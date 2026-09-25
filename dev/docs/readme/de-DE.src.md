@@ -6,7 +6,7 @@ docs/compatibility/devices.json ersetzt.
 website-Blöcke können später ergänzt werden; unmarked Text erscheint in der Git-README.
 -->
 
-# BlueShift
+# BlueShift™
 
 <p align="center">
   <img src="docs/assets/blueshift-logo.png" alt="BlueShift" width="420">
@@ -20,9 +20,9 @@ website-Blöcke können später ergänzt werden; unmarked Text erscheint in der 
 
 **Bringing Classic Bluetooth into the BLE era.**
 
-**BlueShift** ist ein unabhängiges Open-Source-Projekt: eine Bridge von **Classic Bluetooth HID** (BR/EDR) nach **BLE HID**, zunächst vorgesehen für das Board **LILYGO T-Lion**.
+**BlueShift™** ist der Projekt- und Produktname von Meinolf Amekudzi — eine Bridge von **Classic Bluetooth HID** (BR/EDR) nach **BLE HID**, zunächst vorgesehen für das Board **LILYGO T-Lion**.
 
-Paket-/Repo-Identifier (ASCII): `blueshift` — sichtbarer Projektname bleibt **BlueShift**.
+Paket-/Repo-Identifier (ASCII): `blueshift` — öffentlicher Wortlaut **BlueShift™** (Wortmarke; nicht in technischen Identifiern). Details: [`docs/licensing/branding-policy.md`](docs/licensing/branding-policy.md).
 
 **Status:** Milestone 3 — maximale Vorab-Implementierung (`0.3.0-dev`). Board-Layer, SSD1306-Backend, OLED-UI, Nav/ADC, NVS, Factory-Reset, Classic/BLE-Spikes, Bridge-Simulation und Host-Tests sind **IMPLEMENTED_UNVERIFIED**. Physische Hardware ist **noch nicht** verfügbar — daher **nichts physisch VERIFIED**.
 
@@ -216,10 +216,38 @@ ESP][ ist der erste vorgesehene Abnehmer (ESP32-S3 Apple-II-Emulator-Projekt). B
 
 ## Lizenzierung
 
-BlueShift: Open Source (Lizenzdatei folgt mit dem ersten öffentlichen Release-Schnitt; bis dahin Entwicklungscopyright beim Autor).
+Die endgültige Projektlizenz von BlueShift wird derzeit vorbereitet.
 
-Drittanbieter und nur recherchierte Stacks: [`THIRD_PARTY_LICENSES.md`](THIRD_PARTY_LICENSES.md). Bluepad32 / BTstack / ESP32KeyBridge sind **referenziert, nicht eingebunden**.
+Das Projekt soll für persönliche Nutzung, Hobby, Bildung, Forschung und
+andere nicht-kommerzielle Zwecke frei verfügbar bleiben.
 
-µGulp-Ready-Badge: offizielles Artwork unter `docs/assets/microgulp-ready.png` ([Regeln](https://microgulp.dev/de/ready/)).
+Interesse an Herstellung, Vertrieb, Integration oder Verkauf von BlueShift
+oder BlueShift-basierter Hardware? Bitte den Projekt-Autor kontaktieren, um
+kommerzielle Lizenzierung oder OEM-Vereinbarungen zu besprechen:
 
-BlueShift-Logo: `docs/assets/blueshift-logo.png` (Vollfarbe; OLED-Mono später separat).
+- Repository: https://github.com/mamekudz/BlueShift
+- Issues: https://github.com/mamekudz/BlueShift/issues
+- Profil: https://github.com/mamekudz
+
+Drittanbieter-Komponenten unterliegen weiterhin ihren eigenen Lizenzen
+([`THIRD_PARTY_LICENSES.md`](THIRD_PARTY_LICENSES.md),
+[`docs/licensing/license-audit.md`](docs/licensing/license-audit.md)).
+
+Bluepad32 / BTstack / ESP32KeyBridge / EspBle sind **referenziert, nicht
+eingebunden**. Eine BlueShift-Lizenz ersetzt nicht die Lizenzen dieser
+Projekte (bei BTstack insbesondere die kommerziellen Bedingungen von
+BlueKitchen).
+
+Marken-/Logo-Rechte sind von der Softwarelizenz getrennt; siehe
+[`docs/licensing/branding-policy.md`](docs/licensing/branding-policy.md) und
+[`docs/licensing/license-policy-draft.md`](docs/licensing/license-policy-draft.md)
+(**Policy-Entwurf, kein Rechtstext**).
+
+Wortmarke: **BlueShift™** (nicht ®). Grafisches Logo: Entwurf —
+Markenbehandlung **UNDECIDED**.
+
+µGulp-Ready-Badge: offizielles Artwork unter `docs/assets/microgulp-ready.png`
+([Regeln](https://microgulp.dev/de/ready/)).
+
+BlueShift-Logo-Entwurf: `docs/assets/blueshift-logo.png` (Vollfarbe; OLED-Mono
+später separat) — kein automatisches Markenrecht für kommerzielle Produkte.
