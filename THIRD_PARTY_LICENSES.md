@@ -65,9 +65,13 @@ See also `docs/bluetooth/m3-stack-decision.md`.
 
 ---
 
-## Original BlueShift material
+## Included under `components/bluetooth/` (project-owned adapters)
 
-Firmware under `src/`, `include/`, `components/` (except calls into ThingPulse),
-tests, most docs, and tooling are **original BlueShift work**. Final project
-license is **being prepared** — see README Licensing section and
-`docs/licensing/license-policy-draft.md`.
+| Component | Role | Notes |
+| --- | --- | --- |
+| `BluetoothPlatform` | Bluedroid BTDM init | No NimBLE coexistence |
+| `EspIdfClassicHidHost` | Classic HID Host adapter | Radio links only if `CONFIG_BT_HID_*` |
+| `EspIdfBleHidPeripheral` | BLE HID Device adapter | Report builders always; HOGP flag optional |
+
+Selected production architecture: **ESP-IDF Bluedroid BTDM** — commercial-dependency **GREEN**.  
+**BTstack is not required.**

@@ -120,21 +120,23 @@ Upstream explicitly warns that Bluepad32 depends on BlueKitchen BTstack, free fo
 
 | Question | Answer |
 | --- | --- |
-| In BlueShift today? | **No** (REFERENCE_ONLY) |
-| Required by current architecture? | **No** — M3 uses stubs + ThingPulse; dual-host path prefers EspBle research |
-| Upstream LICENSE | https://github.com/bluekitchen/btstack/blob/master/LICENSE (fetched 2026-09-25) |
+| In BlueShift today? | **No** (REFERENCE_ONLY / EVALUATED) |
+| Required by selected architecture? | **No** — production candidate is ESP-IDF Bluedroid BTDM |
+| Upstream LICENSE | https://github.com/bluekitchen/btstack/blob/master/LICENSE |
 
-**Open / non-commercial (public LICENSE clause 4):** redistribution, use, or modification must be **solely for personal benefit and not for any commercial purpose or for monetary gain**.
+**Decision:** Do **not** change BlueShift licensing to accommodate BTstack. Prefer Espressif stack.
 
-**Commercial:** inquire at `contact@bluekitchen-gmbh.com` (per LICENSE / BlueKitchen site). Raspberry Pi and others have negotiated separate deals; **BlueShift does not inherit those**.
+---
 
-**Implication for BlueShift’s intended model:**
+## Selected Bluetooth production candidate (Milestone 4)
 
-- A BlueShift community/commercial dual license **cannot** authorize commercial use of BTstack.
-- If BlueShift later ships Bluepad32/BTstack inside sold devices or closed commercial firmware, the **manufacturer needs a BlueKitchen commercial license** (or must avoid BTstack).
-- Hobby/personal builds using BTstack may fit BTstack’s non-commercial clause; **verify with BlueKitchen** before relying on that for public binary redistribution.
-
-This is a **primary architectural licensing blocker** for Candidate B (Bluepad32 + BTstack).
+| Item | Value |
+| --- | --- |
+| Architecture | ESP-IDF Bluedroid `ESP_BT_MODE_BTDM` + Classic HID Host + BLE HID Device |
+| Adapters | `BluetoothPlatform`, `EspIdfClassicHidHost`, `EspIdfBleHidPeripheral` |
+| Commercial-dependency class | **GREEN** |
+| Current Arduino pin | Classic HID Host **API missing** in prebuilt SDK — Partial |
+| Docs | `docs/licensing/bluetooth-stack-matrix.md`, `docs/bluetooth/esp-idf-dual-mode.md` |
 
 ---
 

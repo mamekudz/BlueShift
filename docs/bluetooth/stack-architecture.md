@@ -75,24 +75,14 @@ ClassicHidHost (interface)     BleHidPeripheral (interface)
 
 Concrete stacks stay behind adapters. BridgeCore / HID models / queues are host-testable without radio.
 
-## Milestone 3 interim decision
+## Milestone 4 decision (commercial-compatible)
 
-See [`m3-stack-decision.md`](m3-stack-decision.md): Classic/BLE **spikes** compile; dual-radio stack **not** default-linked on espressif32 6.9.0 / Arduino 2.x.
+**Selected architecture:** ESP-IDF **Bluedroid BTDM** — Classic HID Host + BLE HID Device.  
+**BTstack required?** **No.**  
+**Commercial-dependency class:** **GREEN** (Espressif Apache-2.0).
 
-## Recommended next physical experiments (when board arrives)
+See [`esp-idf-dual-mode.md`](esp-idf-dual-mode.md) and
+[`../licensing/bluetooth-stack-matrix.md`](../licensing/bluetooth-stack-matrix.md).
 
-1. Bring-up OLED + 5-way + battery ADC (no BT).
-2. Classic HID Host only (one gamepad) with chosen stack.
-3. BLE HID Peripheral only (keyboard or gamepad) to Windows/ESP][.
-4. Dual-host coexistence stress (reconnect loops, both links up).
-5. Full bridge with release-on-disconnect + bounded queues.
-
-## Decision status
-
-**No forced production stack pin yet.**
-
-Research lead: **Candidate A (EspBle dual-host / ESP32KeyBridge patterns)**.
-
-Fallback research: **Candidate B (Bluepad32 + BTstack BLE HID)**.
-
-Milestone 2 implements interfaces, normalized HID, bridge FSM, and docs only — no Bluepad32/EspBle `lib_deps` until a dedicated stack spike.
+Arduino-ESP32 2.x prebuilt SDK currently omits Classic HID Host (`CONFIG_BT_HID`
+off) — adapters compile; Classic radio awaits ESP-IDF/`sdkconfig` with HID Host.

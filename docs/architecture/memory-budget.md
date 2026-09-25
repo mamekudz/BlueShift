@@ -43,12 +43,13 @@ LILYGO T-Lion — ESP32-WROVER with PSRAM (DOCUMENTED / IMPLEMENTED_UNVERIFIED b
 
 ## Latest build numbers
 
-Populate after CI/local `pio run -e t-lion-debug`:
-
 | Env | Flash used | DRAM used | Notes | Measured |
 | --- | --- | --- | --- | --- |
-| skeleton | 290569 / 1310720 (22.2%) | 23160 / 327680 (7.1%) | no OLED lib | 2026-09-25 local |
-| t-lion-debug | 341273 / 1310720 (26.0%) | 23960 / 327680 (7.3%) | ThingPulse 4.6.2 linked | 2026-09-25 local |
+| skeleton (pre-M4) | 290569 / 1310720 (22.2%) | 23160 / 327680 (7.1%) | OLED-less baseline | 2026-09-25 |
+| skeleton (M4 adapters, BT gated off) | 291873 / 1310720 (22.3%) | 23184 / 327680 (7.1%) | no Bluedroid link | 2026-09-25 |
+| t-lion-debug (pre-M4 / OLED only) | 341273 / 1310720 (26.0%) | 23960 / 327680 (7.3%) | ThingPulse | 2026-09-25 |
+| t-lion-debug (M4 + BTDM platform) | 1137381 / 1310720 (86.8%) | 41444 / 327680 (12.6%) | Bluedroid linked | 2026-09-25 LINKER |
 
-Delta OLED library ≈ +50 KiB flash / +0.8 KiB DRAM (order of magnitude from size report).
+**BUILD-TIME / LINKER DATA only** — not physical runtime.  
+Delta for enabling Bluedroid BTDM path on T-Lion ≈ **+780 KiB flash**, **+17 KiB DRAM** vs OLED-only T-Lion build.
 

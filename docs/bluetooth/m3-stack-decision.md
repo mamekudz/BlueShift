@@ -1,37 +1,20 @@
-# Milestone 3 stack decision
+# Milestone 3 interim → Milestone 4 stack decision
 
-**Date context:** pre-physical T-Lion.
+**Superseded for production architecture by:** [`esp-idf-dual-mode.md`](esp-idf-dual-mode.md)
 
-## Chosen interim path
+## Interim (M3)
 
 | Layer | Implementation | Radio |
 | --- | --- | --- |
-| Classic HID Host | `ClassicHidHostSpike` state machine + raw inject | **No Classic radio linked** (stub) |
-| BLE HID Peripheral | `BleHidPeripheralSpike` + report builders; optional NimBLE | NimBLE **off by default** |
-| Bridge / parsers / UI | Real project code | Host-testable |
+| Classic / BLE | Spikes + mocks | No dual radio linked |
 
-## Why not dual-host yet
+## Production candidate (M4)
 
-EspBle dual-host (Milestone 2 lead) requires Arduino-ESP32 **≥ 3.2** class support for Classic companion archives. Current pin:
+| Layer | Implementation | License class |
+| --- | --- | --- |
+| Platform | `BluetoothPlatform` Bluedroid BTDM | GREEN (Espressif) |
+| Classic | `EspIdfClassicHidHost` | GREEN |
+| BLE out | `EspIdfBleHidPeripheral` | GREEN |
+| BTstack / Bluepad32 | **Not used** | Would be RED |
 
-- PlatformIO `espressif32 @ 6.9.0`
-- Arduino 2.x framework line
-
-Enabling NimBLE-Arduino **and** Bluedroid Classic Host together on this pin is high-risk stack duplication (Milestone 3 §41).
-
-## Blocker (exact)
-
-> Dual Classic Host + BLE Peripheral on one ESP32 needs EspBle-style coexistence **or** a platform upgrade. Not proven on BlueShift’s current PlatformIO pin.
-
-## What still compiles / tests
-
-- End-to-end synthetic bridge (parser → BridgeCore → BLE report bytes)
-- Stuck-key / disconnect safety
-- Pairing timeouts in spikes
-- OLED / nav / ADC backends for documented pins
-
-## Next when board + platform allow
-
-1. Upgrade path evaluation to EspBle dual-host **or**
-2. BTstack-only Classic+BLE peripheral (license audit first)
-3. Re-measure flash/DRAM (`docs/architecture/memory-budget.md`)
+Arduino 2.x package still lacks Classic HID Host symbols — Partial until ESP-IDF sdkconfig.
