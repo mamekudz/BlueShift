@@ -1,21 +1,22 @@
 # BlueShift components
 
-Modular firmware boundaries for later milestones. Empty implementation folders
-are intentional in milestone 1 — no placeholder classes merely to fill trees.
+Modular firmware boundaries. Milestone 2 adds host-testable logic and a
+T-Lion board pin layer (**DOCUMENTED / IMPLEMENTED_UNVERIFIED**).
 
-Planned ownership (see `CLAUDE.md`):
-
-| Area | Responsibility |
+| Area | Status |
 | --- | --- |
-| `hardware/` | Board bring-up, pins (after physical verification), power |
-| `display/` | OLED abstraction (controller TBD until verified) |
-| `input/` | Local buttons / navigation |
-| `bluetooth/` | Classic HID host + BLE HID device adapters |
-| `bridge/` | Normalized HID bridge orchestration |
-| `diagnostics/` | Structured logging / diagnostic export |
-| `storage/` | Persistent configuration |
-| `ui/` | OLED screens / menus (via i18x strings) |
-| `i18n/` | Firmware-facing i18x locale resources (started) |
+| `hardware/t_lion/` | DOCUMENTED pins from LilyGO schematic + `adc.ino` |
+| `display/` | Abstraction + framebuffer mock |
+| `input/` | 5-way navigation debounce / long-press |
+| `battery/` | Non-linear % model |
+| `power/` | Power policy (no aggressive sleep yet) |
+| `hid/` | Normalized models + BLE report builders |
+| `bridge/` | FSM + bounded queues |
+| `bluetooth/` | Transport interfaces + profile placeholders (no stack deps) |
+| `ui/` | Screen/nav model (i18x-ready) |
+| `diagnostics/` | RAM diag session records |
+| `storage/` | Versioned `AppConfig` |
+| `i18n/` | en-US / de-DE OLED strings |
+| `logging/` | (via `include/blueshift/log.h`) |
 
-Third-party Bluetooth stacks must stay behind project-owned interfaces
-(`ClassicHidHost`, `BleHidDevice`, …) — not scattered through application code.
+Third-party Bluetooth stacks stay behind project-owned interfaces.

@@ -1,8 +1,5 @@
 #pragma once
 
-// Minimal i18x-facing entry point for future OLED / UI strings.
-// Not a full localization engine — see components/i18n/README.md.
-
 #include <stdint.h>
 
 enum class BlueshiftLocale : uint8_t {
@@ -14,12 +11,31 @@ enum class BlueshiftMsgId : uint16_t {
     BootSkeleton = 0,
     StatusPlanned = 1,
     StatusUnverified = 2,
+    ScreenStatus = 3,
+    ScreenPairInput = 4,
+    ScreenPairHost = 5,
+    ScreenDevices = 6,
+    ScreenProfiles = 7,
+    ScreenDiagnostics = 8,
+    ScreenSettings = 9,
+    ScreenAbout = 10,
+    LabelIn = 11,
+    LabelOut = 12,
+    LabelBat = 13,
+    LabelOk = 14,
+    LabelNotOk = 15,
+    LabelCharging = 16,
+    LabelLowBattery = 17,
+    LabelCriticalBattery = 18,
+    ConfirmFactoryReset = 19,
+    Cancel = 20,
+    MsgCount = 21
 };
 
-// Active locale (default: English technical fallback).
 void i18nSetLocale(BlueshiftLocale locale);
 BlueshiftLocale i18nGetLocale();
-
-// Returns a flash-resident NUL-terminated string for the active locale.
-// Unknown IDs fall back to en-US, then to an empty string.
 const char *i18nMsg(BlueshiftMsgId id);
+
+// Validation helpers (host tests).
+bool i18nHasFallback(BlueshiftMsgId id);
+unsigned i18nMessageCount();

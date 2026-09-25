@@ -1,0 +1,94 @@
+#include "hid/ble_hid_reports.h"
+
+namespace blueshift {
+namespace {
+
+// Minimal boot keyboard descriptor (Usage Page Generic Desktop / Keyboard).
+const uint8_t kKeyboardDesc[] = {
+    0x05, 0x01, 0x09, 0x06, 0xA1, 0x01, 0x05, 0x07, 0x19, 0xE0, 0x29, 0xE7, 0x15, 0x00,
+    0x25, 0x01, 0x75, 0x01, 0x95, 0x08, 0x81, 0x02, 0x95, 0x01, 0x75, 0x08, 0x81, 0x01,
+    0x95, 0x06, 0x75, 0x08, 0x15, 0x00, 0x25, 0x65, 0x05, 0x07, 0x19, 0x00, 0x29, 0x65,
+    0x81, 0x00, 0xC0};
+
+const uint8_t kMouseDesc[] = {
+    0x05, 0x01, 0x09, 0x02, 0xA1, 0x01, 0x09, 0x01, 0xA1, 0x00, 0x05, 0x09, 0x19, 0x01,
+    0x29, 0x03, 0x15, 0x00, 0x25, 0x01, 0x95, 0x03, 0x75, 0x01, 0x81, 0x02, 0x95, 0x01,
+    0x75, 0x05, 0x81, 0x01, 0x05, 0x01, 0x09, 0x30, 0x09, 0x31, 0x09, 0x38, 0x15, 0x81,
+    0x25, 0x7F, 0x75, 0x08, 0x95, 0x03, 0x81, 0x06, 0xC0, 0xC0};
+
+// Simplified gamepad descriptor placeholder (not a claim of host interoperability).
+const uint8_t kGamepadDesc[] = {
+    0x05, 0x01, 0x09, 0x05, 0xA1, 0x01, 0xA1, 0x00, 0x05, 0x01, 0x09, 0x30, 0x09, 0x31,
+    0x09, 0x32, 0x09, 0x35, 0x15, 0x00, 0x26, 0xFF, 0x00, 0x75, 0x08, 0x95, 0x04, 0x81,
+    0x02, 0x09, 0x39, 0x15, 0x00, 0x25, 0x07, 0x75, 0x04, 0x95, 0x01, 0x81, 0x02, 0x05,
+    0x09, 0x19, 0x01, 0x29, 0x10, 0x15, 0x00, 0x25, 0x01, 0x75, 0x01, 0x95, 0x10, 0x81,
+    0x02, 0xC0, 0xC0};
+
+} // namespace
+
+HidDescriptorView bleKeyboardDescriptor() {
+    return {kKeyboardDesc, sizeof(kKeyboardDesc)};
+}
+
+HidDescriptorView bleMouseDescriptor() {
+    return {kMouseDesc, sizeof(kMouseDesc)};
+}
+
+HidDescriptorView bleGamepadDescriptor() {
+    return {kGamepadDesc, sizeof(kGamepadDesc)};
+}
+
+uint8_t scaleAxisToUint8(int16_t axis) {
+    // Map [-32767,32767] -> [0,255], 0 -> 128.
+    const int v = static_cast<int>(axis) + 32768;
+    const int scaled = v / 256;
+    if (scaled < 0) {
+        return 0;
+    }
+    if (scaled > 255) {
+        return 255;
+    }
+    return static_cast<uint8_t>(scaled);
+}
+
+bool buildKeyboardReport(uint8_t modifiers, const uint8_t keys[6], uint8_t out[8]) {
+    if (out == nullptr || keys == nullptr) {
+        return false;
+    }
+    out[0] = modifiers;
+    out[1] = 0;
+    for (int i = 0; i < 6; ++i) {
+        out[2 + i] = keys[i];
+    }
+    return true;
+}
+
+bool buildMouseReport(uint8_t buttons, int8_t dx, int8_t dy, int8_t wheel, uint8_t out[4]) {
+    if (out == nullptr) {
+        return false;
+    }
+    out[0] = buttons & 0x07;
+    out[1] = static_cast<uint8_t>(dx);
+    out[2] = static_cast<uint8_t>(dy);
+    out[3] = static_cast<uint8_t>(wheel);
+    return true;
+}
+
+bool buildGamepadReport(int16_t lx, int16_t ly, int16_t rx, int16_t ry, uint8_t lt, uint8_t rt,
+                        uint16_t buttons, uint8_t hat, uint8_t out[9]) {
+    if (out == nullptr) {
+        return false;
+    }
+    out[0] = scaleAxisToUint8(lx);
+    out[1] = scaleAxisToUint8(ly);
+    out[2] = scaleAxisToUint8(rx);
+    out[3] = scaleAxisToUint8(ry);
+    out[4] = lt;
+    out[5] = rt;
+    out[6] = static_cast<uint8_t>(buttons & 0xFF);
+    out[7] = static_cast<uint8_t>((buttons >> 8) & 0xFF);
+    out[8] = hat & 0x0F;
+    return true;
+}
+
+} // namespace blueshift

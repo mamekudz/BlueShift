@@ -16,7 +16,7 @@
 
 Paket-/Repo-Identifier (ASCII): `blueshift` — sichtbarer Projektname bleibt **BlueShift**.
 
-**Status:** Milestone 1 — Repository-Foundation. Firmware-Funktionen (Classic BT, BLE HID, Bridge, OLED, Akku) sind **noch nicht** implementiert. Physische Hardware ist **noch nicht** verfügbar.
+**Status:** Milestone 2 — Research + Pre-Implementation. Architektur, Host-Tests und dokumentierte T-Lion-Pinannahmen sind vorbereitet. Physische Hardware ist **noch nicht** verfügbar — daher **nichts physisch VERIFIED**.
 
 Dieses Repository ist **µGulp-ready** (Gulp-Tasks für Dokumentation, Formatierung und Backup; siehe [Entwicklung](#entwicklung)).
 
@@ -45,10 +45,13 @@ BlueShift adressiert genau diese Lücke — unabhängig davon, ob der erste Abne
 | Stufe | Bedeutung |
 | --- | --- |
 | **VERIFIED** | Am physischen BlueShift-Gerät nachvollzogen |
+| **DOCUMENTED** | Hersteller-/Schematic-Beleg, bei uns noch nicht gemessen |
+| **IMPLEMENTED_UNVERIFIED** | Code vorhanden/kompiliert/getestet, nicht auf unserem T-Lion gelaufen |
 | **EXPERIMENTAL** | Vorhanden, Verifikation unvollständig |
 | **PLANNED** | Architektur/Ziel, noch nicht gebaut |
+| **ASSUMED** | Arbeitsannahme, muss verifiziert werden |
 | **INCOMPATIBLE** | Mit belegter Begründung ausgeschlossen |
-| **UNVERIFIED** | Hersteller-/Rechercheangabe, Board noch nicht da |
+| **UNKNOWN** | Evidenz unzureichend |
 
 Solange das T-Lion nicht physisch getestet ist, dürfen OLED, Akku, Classic BT, BLE und PSRAM **nicht** als VERIFIED gelten.
 
@@ -56,21 +59,24 @@ Solange das T-Lion nicht physisch getestet ist, dürfen OLED, Akku, Classic BT, 
 
 ## Vorgesehene Hardware (T-Lion)
 
-Zielplattform (alles **UNVERIFIED** bis Bring-up):
+Dossier: [`docs/hardware/t-lion.md`](docs/hardware/t-lion.md) (Schematic `t18_v2.3.pdf` + offizielles LilyGO-Beispiel).
 
-| | |
-| --- | --- |
-| Board | LILYGO T-Lion (T-Controller) |
-| MCU | classic ESP32 / ESP32-WROVER |
-| Display | OLED (Controller/Pins unbestätigt) |
-| Strom | 18650-Halter |
-| Build | **PlatformIO** |
+| | | Confidence |
+| --- | --- | --- |
+| Board | LILYGO T-Lion / T-Controller / T18 | DOCUMENTED |
+| MCU | ESP32-WROVER | DOCUMENTED |
+| OLED | SSD1306 128×64 I²C `0x3C`, SDA21/SCL22 | DOCUMENTED |
+| 5-Wege | GPIO 32/33/34/36/39 | DOCUMENTED |
+| Akku-ADC | GPIO35, Teiler ×2 | DOCUMENTED |
+| Charger | TP5400 | DOCUMENTED |
+| USB-UART | Schematic CP2104 vs. Marketing CH9102 | CONFLICT / UNKNOWN |
+| Zellschutz | Nicht als vollständig nachgewiesen | UNKNOWN |
 
-Siehe `docs/hardware/t-lion.md`. Es gibt **keine** offizielle PlatformIO-Board-ID `lilygo-t-lion`. Milestone 1 nutzt `esp32dev` nur als **provisorischen Compile-Smoke**-Target (`skeleton` / `debug` / `release`) — **kein** Pinout-Claim.
+PlatformIO: `skeleton` (esp32dev smoke) + `t-lion-debug` / `t-lion-release` (custom board JSON, **IMPLEMENTED_UNVERIFIED**).
 
 ---
 
-## Architektur (PLANNED)
+## Architektur (IMPLEMENTED_UNVERIFIED / PLANNED)
 
 ```
 Classic HID Report
@@ -84,35 +90,15 @@ Classic HID Report
   BLE HID Report
 ```
 
-Schichten bleiben getrennt (Raw → Normalized → Mapped), damit Kompatibilitätsfixes die Transportschicht nicht vermischen.
+Vorbereitet in `components/` (Host-Tests ohne Hardware):
 
-### Classic HID Input — PLANNED
+- Normalized HID + BLE Report-Builder
+- `BridgeCore` FSM + bounded queues + Disconnect-Policy
+- Navigation (5-Wege Debounce/Long-Press), UI-Screens, Battery-Modell, Power-Policy
+- i18x en-US/de-DE für OLED-Strings
+- BT-Interfaces (`ClassicHidHost` / `BleHidPeripheral`) — noch **ohne** Stack-`lib_deps`
 
-Klassische BR/EDR-HID-Geräte als Eingang. Noch nicht implementiert. Keine Bluepad32/BTstack-Abhängigkeit in diesem Milestone.
-
-### Normalized HID Layer — PLANNED
-
-Geräteprofile (z. B. SN30 Pro, Nimbus) liefern normalisierten Zustand. Keine `if (name == …)`-Verzweigungen in der Bridge-Kernlogik.
-
-### BLE HID Output — PLANNED
-
-BlueShift erscheint dem Host als BLE-HID-Gerät. Nicht gestartet.
-
-### OLED — PLANNED / UNVERIFIED
-
-Status, Pairing-Hinweise, Diagnose. Texte über **i18x** (`components/i18n/`). Das aktuelle Vollfarben-Logo ist **nicht** das spätere monochrome OLED-Logo.
-
-### Battery — PLANNED / UNVERIFIED
-
-18650-Überwachung nach physischer Pin-/ADC-Verifikation.
-
-### Geplante Geräteklassen — PLANNED
-
-Gamepads zuerst; später Tastaturen und weitere HID-Klassen, sobald die Bridge stabil ist.
-
-### Diagnostics — PLANNED
-
-Strukturierte Kategorien (`[BOOT]`, `[BT-CLASSIC]`, `[BLE]`, `[BRIDGE]`, …). Keine Secrets in Logs.
+Bluetooth-Recherche: [`docs/bluetooth/stack-architecture.md`](docs/bluetooth/stack-architecture.md) — Research-Lead **EspBle Dual-Host / ESP32KeyBridge-Muster**; Bluepad32 als Alternative.
 
 ---
 
@@ -151,20 +137,19 @@ Generated from [`docs/compatibility/devices.json`](docs/compatibility/devices.js
 ### PlatformIO
 
 ```text
-platformio.ini   — skeleton / debug / release (provisional esp32dev)
-src/main.cpp     — Boot-Skeleton
-include/blueshift/version.h  — 0.1.0-dev
+platformio.ini   — skeleton / t-lion-debug / t-lion-release / native
+src/main.cpp     — Boot-Skeleton + dokumentierte Pin-Logs
+include/blueshift/version.h  — 0.2.0-dev
 ```
 
-Gepinnt: `espressif32 @ 6.9.0`. Keine Bluetooth-Libraries in Milestone 1.
-
-Wenn PlatformIO installiert ist:
+Gepinnt: `espressif32 @ 6.9.0`. Bluetooth-Stacks noch **nicht** als `lib_deps`.
 
 ```bash
 pio run -e skeleton
+pio run -e t-lion-debug
+pio run -e native          # Host-Unit-Tests
+npm run test:infra
 ```
-
-Ein erfolgreicher Skeleton-Build beweist nur die Toolchain — **nicht** T-Lion-Hardware.
 
 ### µGulp / Gulp
 
@@ -207,15 +192,14 @@ Host-Logik-Tests folgen später unter `test/` (HID-Normalisierung, Config, i18x,
 
 | Bereich | Stufe |
 | --- | --- |
-| Repository / µGulp / Docs | Milestone 1 (diese Foundation) |
-| PlatformIO Skeleton | EXPERIMENTAL (provisional board) |
-| T-Lion OLED / Pins / Akku | UNVERIFIED |
-| Classic BT Host | PLANNED |
-| BLE HID Device | PLANNED |
-| Bridge | PLANNED |
+| Repository / µGulp / Docs | Milestone 1+2 Foundation |
+| T-Lion Dossier / Schematic | DOCUMENTED |
+| PlatformIO `t-lion-*` | IMPLEMENTED_UNVERIFIED |
+| Bridge / HID / UI Logic (Host-Tests) | IMPLEMENTED_UNVERIFIED |
+| Classic BT / BLE Stack in Firmware | PLANNED (Recherche abgeschlossen) |
 | Physische Verifikation | ausstehend |
 
-Nächster Milestone (separater Prompt): **PHYSICAL T-LION HARDWARE BRING-UP**.
+Version: **0.2.0-dev**. Nächster physischer Schritt: **T-LION HARDWARE BRING-UP**.
 
 ---
 

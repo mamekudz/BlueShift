@@ -1,9 +1,25 @@
 #pragma once
 
-// en-US — technical fallback locale (flash-resident string table stub).
-
 static const char *const kLocaleEnUs[] = {
-    "BlueShift boot",      // BlueshiftMsgId::BootSkeleton
-    "PLANNED",             // BlueshiftMsgId::StatusPlanned
-    "UNVERIFIED",          // BlueshiftMsgId::StatusUnverified
+    "BlueShift boot",
+    "PLANNED",
+    "UNVERIFIED",
+    "Status",
+    "Pair classic input",
+    "Pair BLE host",
+    "Devices",
+    "Profiles",
+    "Diagnostics",
+    "Settings",
+    "About",
+    "IN",
+    "OUT",
+    "BAT",
+    "OK",
+    "NOT OK",
+    "Charging",
+    "Low battery",
+    "Critical battery",
+    "Factory reset?",
+    "Cancel",
 };

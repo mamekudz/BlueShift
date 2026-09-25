@@ -21,6 +21,7 @@ export const NAS_BACKUP_INCLUDE_DIRS = Object.freeze([
   "src",
   "include",
   "components",
+  "boards",
   "docs",
   "dev",
   "config",

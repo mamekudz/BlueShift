@@ -1,9 +1,25 @@
 #pragma once
 
-// de-DE — primary human locale planned for OLED UI.
-
 static const char *const kLocaleDeDe[] = {
-    "BlueShift Start",     // BlueshiftMsgId::BootSkeleton
-    "GEPLANT",             // BlueshiftMsgId::StatusPlanned
-    "UNBESTAETIGT",        // BlueshiftMsgId::StatusUnverified
+    "BlueShift Start",
+    "GEPLANT",
+    "UNBESTAETIGT",
+    "Status",
+    "Classic-Eingabe koppeln",
+    "BLE-Host koppeln",
+    "Geraete",
+    "Profile",
+    "Diagnose",
+    "Einstellungen",
+    "Info",
+    "EIN",
+    "AUS",
+    "AKKU",
+    "OK",
+    "NICHT OK",
+    "Laden",
+    "Akku niedrig",
+    "Akku kritisch",
+    "Werksreset?",
+    "Abbrechen",
 };

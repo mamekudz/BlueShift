@@ -6,32 +6,34 @@ BlueShift tracks researched vs. actually incorporated dependencies separately.
 
 | Project | Version | License | Source | Modifications |
 | --- | --- | --- | --- | --- |
-| *(none yet — milestone 1 foundation only)* | — | — | — | — |
+| *(none — no Bluepad32 / EspBle / BTstack / OLED driver vendored yet)* | — | — | — | — |
 
-Toolchain / build dependencies used to develop BlueShift (not shipped as firmware
-source) will be listed here when pinned into the project (PlatformIO packages,
-npm packages such as `gulp` / `gulp-mu-gulp-api`).
+Build toolchain pins (not firmware source):
+
+| Tool | Pin | Notes |
+| --- | --- | --- |
+| PlatformIO `espressif32` | 6.9.0 | `platformio.ini` |
+| npm `gulp` | ^5.0.0 | `package.json` |
+| npm `gulp-mu-gulp-api` | ^0.5.0 | µGulp task API |
 
 ## Evaluated / referenced (NOT incorporated)
 
-These projects were researched for architecture or compatibility. Their code is
-**not** copied into BlueShift at this milestone.
-
 | Project | Role | License note | Source |
 | --- | --- | --- | --- |
-| Bluepad32 | Classic/BLE gamepad stack research | Verify before adopt | https://github.com/ricardoquesada/bluepad32 |
-| BTstack | Possible Classic BT stack research | Verify before adopt | https://github.com/bluekitchen/btstack |
-| ESP32KeyBridge | Related Classic→BLE bridge reference | Verify before adopt | https://github.com/tanakamasayuki/ESP32KeyBridge |
-| PlatformIO `espressif32` | Planned firmware platform (pinned in `platformio.ini`) | PlatformIO / Espressif terms | https://github.com/platformio/platform-espressif32 |
-| µGulp / `gulp-mu-gulp-api` | Task runner API (npm) | See package license | https://microgulp.dev/ |
+| Bluepad32 | Classic gamepad host research | Verify before adopt | https://github.com/ricardoquesada/bluepad32 |
+| BTstack | Bluepad32 underlying stack | Verify before adopt | https://github.com/bluekitchen/btstack |
+| ESP32KeyBridge | Classic→BLE bridge architecture reference | MIT | https://github.com/tanakamasayuki/ESP32KeyBridge |
+| EspBle / EspBleClassic | Dual-host candidate (BLE + Classic) | MIT + bundled notices | https://github.com/tanakamasayuki/EspBle |
+| ThingPulse esp8266-oled-ssd1306 | OLED driver candidate (LilyGO example) | Verify before adopt | https://github.com/ThingPulse/esp8266-oled-ssd1306 |
+| Button2 | Button helper (LilyGO example) | Verify before adopt | https://github.com/lewisxhe/Button2 |
+| LilyGO TTGO-T-ControllerV2.2 | Schematic + example pins | Manufacturer repo | https://github.com/LilyGO/TTGO-T-ControllerV2.2 |
 
-Before adopting Bluepad32 or BTstack into firmware, verify the exact licenses
-applicable to this open-source project and record them in the **Incorporated**
-table (see `CLAUDE.md` §78–§79).
+See also `docs/bluetooth/*.md`.
 
 ## Assets
 
 | Asset | Origin | Notes |
 | --- | --- | --- |
-| `docs/assets/microgulp-ready.png` | Official µGulp ready artwork | Unchanged canonical badge |
-| `docs/assets/blueshift-logo.png` | BlueShift logo concept (project draft) | Full-color; OLED mono variant TBD |
+| `docs/assets/microgulp-ready.png` | Official µGulp ready artwork | Unchanged |
+| `docs/assets/blueshift-logo.png` | BlueShift draft logo | Full-color; OLED mono TBD by author |
+| `docs/hardware/evidence/t18_v2.3.pdf` | LilyGO schematic copy | Evidence only |

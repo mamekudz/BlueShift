@@ -1,6 +1,6 @@
 {
   "name": "blueshift",
-  "version": "0.1.0-dev",
+  "version": "0.2.0-dev",
   "private": true,
   "description": "BlueShift — Bringing Classic Bluetooth into the BLE era (µGulp / Gulp task runner)",
   "type": "module",
@@ -18,6 +18,9 @@
     "backup:nas": "gulp backup:nas",
     "backup:all": "gulp backup:all",
     "test:infra": "node --test dev/tools/infra.test.mjs",
+    "test:host": "node --test dev/tools/host_logic.test.mjs",
+    "test:host:native": "pio run -e native",
+    "test": "npm run test:infra && npm run test:host",
     "gulp:tasks": "gulp --tasks"
   },
   "microgulp": {

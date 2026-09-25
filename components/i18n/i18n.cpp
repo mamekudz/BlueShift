@@ -7,8 +7,6 @@ namespace {
 
 BlueshiftLocale g_locale = BlueshiftLocale::EnUs;
 
-constexpr uint16_t kMsgCount = 3;
-
 const char *const *tableFor(BlueshiftLocale locale) {
     switch (locale) {
     case BlueshiftLocale::DeDe:
@@ -29,9 +27,21 @@ BlueshiftLocale i18nGetLocale() {
     return g_locale;
 }
 
+unsigned i18nMessageCount() {
+    return static_cast<unsigned>(BlueshiftMsgId::MsgCount);
+}
+
+bool i18nHasFallback(BlueshiftMsgId id) {
+    const auto index = static_cast<uint16_t>(id);
+    if (index >= static_cast<uint16_t>(BlueshiftMsgId::MsgCount)) {
+        return false;
+    }
+    return kLocaleEnUs[index] != nullptr && kLocaleEnUs[index][0] != '\0';
+}
+
 const char *i18nMsg(BlueshiftMsgId id) {
     const auto index = static_cast<uint16_t>(id);
-    if (index >= kMsgCount) {
+    if (index >= static_cast<uint16_t>(BlueshiftMsgId::MsgCount)) {
         return "";
     }
     const char *text = tableFor(g_locale)[index];

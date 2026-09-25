@@ -20,6 +20,7 @@ export const GIT_BACKUP_ENSURE_PATHS = Object.freeze([
   "src",
   "include",
   "components",
+  "boards",
   "docs",
   "dev",
   "test",
