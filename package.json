@@ -1,0 +1,30 @@
+{
+  "name": "blueshift",
+  "version": "0.1.0-dev",
+  "private": true,
+  "description": "BlueShift — Bringing Classic Bluetooth into the BLE era (µGulp / Gulp task runner)",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "help": "gulp help",
+    "docs": "gulp docs",
+    "format": "gulp format",
+    "format:check": "gulp format:check",
+    "check": "gulp check",
+    "backup": "gulp backup",
+    "backup:git": "gulp backup:git",
+    "backup:nas": "gulp backup:nas",
+    "backup:all": "gulp backup:all",
+    "test:infra": "node --test dev/tools/infra.test.mjs",
+    "gulp:tasks": "gulp --tasks"
+  },
+  "microgulp": {
+    "ready": true
+  },
+  "devDependencies": {
+    "gulp": "^5.0.0",
+    "gulp-mu-gulp-api": "^0.5.0"
+  }
+}

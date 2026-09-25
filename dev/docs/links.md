@@ -1,0 +1,3 @@
+fünf wege schalter
+
+https://www.amazon.de/MechPort-Adapterplatine-Stiftleiste-Controller-Steuerung/dp/B0GZFGHFHV/ref=sr_1_40?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=3KKY6HKLPUW3X&dib=eyJ2IjoiMSJ9.Ph7TkR18YvjBE5TzSQO4jua7gTrWoIkXSy92aO7E48fhAnYFtH8wGJRIVeeEaiv3a66dH4lz0shAU63OpQYNcmFSTq-nEn_NhR17EsLGHZqhizJppACIXAfgZluDdGGiRtqpu3N0lB96mjOW9llhoRrPppNzp5aVrQ2qfxplv2R61i6Reyh3zt_TsP9wwKi3UBLOjcmsNH2kPN8p6TKUwKU0kZJQhCzy4t-PXfZmZhtqQZPMNQuwSE9mZTo1ccsFDEsVUPQky5sM2293EaQ3zQu4x2Bv83-nbW7JKNjhRe8.PVqyZggM15IqMVmdG7JgMymTigckIaewxb-zP0Jno1E&dib_tag=se&keywords=vier+wege+taster&qid=1790356170&sprefix=vierwege+taster%2Caps%2C372&sr=8-40

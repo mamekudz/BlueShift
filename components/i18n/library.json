@@ -1,0 +1,8 @@
+{
+  "name": "i18n",
+  "version": "0.1.0",
+  "description": "BlueShift embedded i18x string stub",
+  "build": {
+    "includeDir": "."
+  }
+}

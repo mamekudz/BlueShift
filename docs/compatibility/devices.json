@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "title": "BlueShift device compatibility",
+  "notes": "Single source of truth. Generate README tables from this file via Gulp. Do not duplicate conflicting tables by hand.",
+  "statusValues": {
+    "blueShiftStatus": ["VERIFIED", "CANDIDATE", "INCOMPATIBLE", "USB_ONLY", "UNKNOWN", "NOT_APPLICABLE"],
+    "esp2Status": ["VERIFIED", "CANDIDATE", "INCOMPATIBLE", "USB_ONLY", "UNKNOWN", "NOT_APPLICABLE"],
+    "physicalTest": ["NONE", "PARTIAL", "PASS", "FAIL", "PENDING"]
+  },
+  "references": {
+    "bluepad32SupportedGamepads": "https://bluepad32.readthedocs.io/en/latest/supported_gamepads/",
+    "bluepad32Issue154": "https://github.com/ricardoquesada/bluepad32/issues/154",
+    "esp32KeyBridge": "https://github.com/tanakamasayuki/ESP32KeyBridge"
+  },
+  "devices": [
+    {
+      "id": "8bitdo-sn30-pro",
+      "manufacturer": "8BitDo",
+      "model": "SN30 Pro",
+      "modelNumber": "",
+      "fccId": "",
+      "deviceClass": "gamepad",
+      "transport": ["classic-br-edr"],
+      "pairingMode": "unknown",
+      "blueShiftStatus": "CANDIDATE",
+      "esp2Status": "INCOMPATIBLE",
+      "physicalTest": "NONE",
+      "evidence": [
+        {
+          "type": "documentation",
+          "summary": "Classic Bluetooth / BR/EDR gamepad; candidate future BlueShift Classic HID input. Not suitable for direct ESP32-S3 BLE wireless use on ESP][.",
+          "url": "https://bluepad32.readthedocs.io/en/latest/supported_gamepads/"
+        }
+      ],
+      "manufacturerUrl": "https://www.8bitdo.com/",
+      "retailUrls": [],
+      "notes": "Do not claim BlueShift VERIFIED until Classic HID path is physically tested on T-Lion."
+    },
+    {
+      "id": "steelseries-nimbus-69070",
+      "manufacturer": "SteelSeries",
+      "model": "Nimbus",
+      "modelNumber": "69070",
+      "fccId": "",
+      "deviceClass": "gamepad",
+      "transport": ["classic-br-edr"],
+      "pairingMode": "unknown",
+      "blueShiftStatus": "CANDIDATE",
+      "esp2Status": "INCOMPATIBLE",
+      "physicalTest": "PARTIAL",
+      "evidence": [
+        {
+          "type": "physical-esp2-ble-scan",
+          "summary": "Physically tested against ESP][ BLE scanner: visible to Windows Bluetooth, NOT visible in ESP32-S3 BLE scan. Therefore direct ESP][ BLE wireless: INCOMPATIBLE. Candidate BlueShift Classic input.",
+          "url": ""
+        }
+      ],
+      "manufacturerUrl": "https://steelseries.com/",
+      "retailUrls": [],
+      "notes": "Classic-path feasibility for BlueShift is PLANNED / CANDIDATE — not yet verified on T-Lion."
+    },
+    {
+      "id": "xbox-controller-1697",
+      "manufacturer": "Microsoft",
+      "model": "Xbox Controller",
+      "modelNumber": "1697",
+      "fccId": "",
+      "deviceClass": "gamepad",
+      "transport": ["proprietary-wireless", "usb"],
+      "pairingMode": "n/a",
+      "blueShiftStatus": "USB_ONLY",
+      "esp2Status": "INCOMPATIBLE",
+      "physicalTest": "NONE",
+      "evidence": [
+        {
+          "type": "product-knowledge",
+          "summary": "No normal Bluetooth Classic/BLE HID for wireless use. Do not classify as BlueShift Classic HID candidate without new evidence.",
+          "url": ""
+        }
+      ],
+      "manufacturerUrl": "https://www.xbox.com/",
+      "retailUrls": [],
+      "notes": "USB-oriented; out of scope for Classic→BLE bridge without contrary evidence."
+    },
+    {
+      "id": "terios-t3-shanwan-bm769",
+      "manufacturer": "Terios / ShanWan",
+      "model": "T3",
+      "modelNumber": "BM-769",
+      "fccId": "",
+      "deviceClass": "gamepad",
+      "transport": ["ble"],
+      "pairingMode": "unknown",
+      "blueShiftStatus": "NOT_APPLICABLE",
+      "esp2Status": "CANDIDATE",
+      "physicalTest": "PENDING",
+      "evidence": [
+        {
+          "type": "community",
+          "summary": "Inexpensive BLE controller discussion relevant to direct ESP][ use (not primary BlueShift Classic-input target).",
+          "url": "https://github.com/ricardoquesada/bluepad32/issues/154"
+        }
+      ],
+      "manufacturerUrl": "",
+      "retailUrls": [],
+      "notes": "Ordered / physical verification pending for ESP][. Not a primary BlueShift Classic-input target."
+    },
+    {
+      "id": "vr-park-controller",
+      "manufacturer": "VR PARK",
+      "model": "Controller",
+      "modelNumber": "",
+      "fccId": "",
+      "deviceClass": "gamepad",
+      "transport": ["ble"],
+      "pairingMode": "unknown",
+      "blueShiftStatus": "NOT_APPLICABLE",
+      "esp2Status": "CANDIDATE",
+      "physicalTest": "PARTIAL",
+      "evidence": [
+        {
+          "type": "physical-esp2-ble-scan",
+          "summary": "Physically visible in ESP32-S3 BLE scan on ESP][. Deeper HID/GATT analysis pending. Direct ESP][ candidate.",
+          "url": ""
+        }
+      ],
+      "manufacturerUrl": "",
+      "retailUrls": [],
+      "notes": "ESP][ path: BLE discovered. BlueShift Classic bridge is not the primary interest for this device."
+    }
+  ]
+}
