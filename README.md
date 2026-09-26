@@ -261,7 +261,10 @@ Original BlueShift materials are licensed under the **BlueShift Community Licens
 ([`LICENSE.md`](LICENSE.md)) — provisional custom license text.
 
 Non-commercial personal, hobby, educational and research use is permitted under that
-license. **Commercial Use requires a separate written license** from the author.
+license, including non-commercial redistribution of source, firmware binaries and
+related materials as described in `LICENSE.md`. **Commercial Use requires a separate
+written license** from the author. Commercial organizations may evaluate and prototype
+internally under Section 5 of the license.
 
 Interested in manufacturing, distribution, integration or sale of BlueShift or
 BlueShift-based hardware? Please contact the project author about commercial

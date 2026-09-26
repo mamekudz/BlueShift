@@ -346,4 +346,27 @@ test("BlueShift Community License is present", () => {
   assert.match(lic, /BlueShift Community License 1\.0/);
   assert.match(lic, /Commercial Use Requires a Separate License/);
   assert.match(lic, /Meinolf Amekudzi/);
+  assert.match(lic, /Provisional project license text/);
+  assert.match(lic, /Evaluation by Commercial Organizations/);
+  assert.match(lic, /compiled firmware or binaries/);
+  assert.doesNotMatch(lic, /BlueShift®/);
+  assert.doesNotMatch(lic, /##\s*\d+\.\s*Governing Law/i);
+  assert.doesNotMatch(lic, /exclusive jurisdiction/i);
+
+  const pkg = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8"));
+  assert.equal(pkg.license, "SEE LICENSE.md");
+
+  const readme = readFileSync(join(ROOT, "README.md"), "utf8");
+  assert.match(readme, /LICENSE\.md/);
+  assert.match(readme, /BlueShift Community License 1\.0/);
+  assert.match(readme, /BlueShift™/);
+  assert.doesNotMatch(readme, /BlueShift®/);
+  assert.doesNotMatch(readme, /\blicensed under the MIT\b/i);
+  assert.doesNotMatch(readme, /\blicensed under the GPL\b/i);
+  assert.doesNotMatch(readme, /\blicensed under Apache\b/i);
+
+  assert.ok(existsSync(join(ROOT, "THIRD_PARTY_LICENSES.md")));
+  const branding = readFileSync(join(ROOT, "docs/licensing/branding-policy.md"), "utf8");
+  assert.match(branding, /UNDECIDED/);
+  assert.match(branding, /Do \*\*not\*\* use ®/);
 });

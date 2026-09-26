@@ -43,7 +43,7 @@ Classification keys:
 
 | Component | Origin class | Current use | License (upstream) | In repo / Distributed? | Commercial implications | Attribution | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `src/`, `include/blueshift/*`, most of `components/**` | ORIGINAL_BLUESHIFT | Firmware + host tests | *BlueShift TBD* | Yes / yes (firmware) | Governed by future BlueShift license | Author | Clear |
+| `src/`, `include/blueshift/*`, most of `components/**` | ORIGINAL_BLUESHIFT | Firmware + host tests | **BlueShift Community License 1.0** ([`LICENSE.md`](../../LICENSE.md), provisional) | Yes / yes (firmware) | Non-commercial under BCL; commercial needs separate license | Author | Clear |
 | `boards/lilygo_t_lion.json` | ORIGINAL_BLUESHIFT | PlatformIO board JSON | *BlueShift TBD* | Yes / build meta | Author | Clear |
 | `platformio.ini`, `gulpfile.mjs`, `dev/tools/*` | ORIGINAL_BLUESHIFT | Build / µGulp | *BlueShift TBD* | Yes / tool-only | Author | Clear |
 | `docs/**` (except noted assets/evidence) | ORIGINAL_BLUESHIFT | Documentation | *BlueShift TBD* | Yes / docs | Author | Clear |
@@ -194,11 +194,11 @@ Upstream explicitly warns that Bluepad32 depends on BlueKitchen BTstack, free fo
 
 ## Blockers for the intended community/commercial model
 
-1. **Final BlueShift license text not yet written** (intentional).  
-2. **BTstack** if that stack path is chosen — separate commercial deal required for commercial products.  
-3. **Brand/logo** must be carved out of any software grant.  
+1. **BlueShift Community License 1.0** in [`LICENSE.md`](../../LICENSE.md) (**provisional** until author declares final).  
+2. **BTstack** if that stack path is chosen — separate commercial deal required for commercial products. **Not** a production dependency.  
+3. **Brand/logo** must be carved out of any software grant (BCL §7; ™ only, never ®; logo **UNDECIDED**).  
 4. **Third-party notices** (ThingPulse MIT; Espressif Apache NOTICE; future stacks) must ship with binaries.  
-5. **Contributor inbound rights** — risk if merging PRs before dual-license CLA/terms.  
+5. **Contributor inbound rights** — risk if merging PRs before dual-license CLA/terms (BCL §6).  
 6. **LilyGO evidence materials** — keep as documentation evidence; do not present as BlueShift-owned hardware IP.
 
 Paths that currently look **compatible** with a commercial BlueShift layer (subject to final counsel review):
