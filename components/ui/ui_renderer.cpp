@@ -76,9 +76,20 @@ void UiRenderer::renderListScreen(Display &d, BlueshiftMsgId title, int selectio
 
 void UiRenderer::renderAbout(Display &d) const {
     d.drawText(0, 0, i18nMsg(BlueshiftMsgId::ScreenAbout));
-    d.drawText(0, 16, BLUESHIFT_VERSION_STRING);
-    d.drawText(0, 32, i18nMsg(BlueshiftMsgId::StatusUnverified));
-    d.drawText(0, 48, "T-Lion");
+    d.drawText(0, 14, BLUESHIFT_VERSION_STRING);
+#if defined(BLUESHIFT_NATIVE_ESP_IDF)
+#if BLUESHIFT_BUILD_TYPE_DEBUG
+    d.drawText(0, 28, "debug / IDF");
+#else
+    d.drawText(0, 28, "release / IDF");
+#endif
+#elif BLUESHIFT_BUILD_TYPE_DEBUG
+    d.drawText(0, 28, "debug / Arduino");
+#else
+    d.drawText(0, 28, "release / Arduino");
+#endif
+    d.drawText(0, 42, i18nMsg(BlueshiftMsgId::StatusUnverified));
+    d.drawText(0, 54, "T-Lion");
 }
 
 void UiRenderer::renderConfirmReset(Display &d) const {

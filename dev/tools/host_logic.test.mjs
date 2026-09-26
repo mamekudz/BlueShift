@@ -260,12 +260,17 @@ test("t-lion pins and board facade exist", () => {
 test("M3 components present", () => {
   const need = [
     "components/display/ssd1306_display.cpp",
+    "components/display/idf_ssd1306_display.cpp",
     "components/ui/ui_renderer.cpp",
     "components/storage/config_store.cpp",
+    "components/storage/device_store.cpp",
     "components/bluetooth/classic_hid_host.cpp",
     "components/bluetooth/ble_hid_peripheral.cpp",
+    "components/bluetooth/reconnect_policy.h",
     "components/app/application.cpp",
     "docs/architecture/memory-budget.md",
+    "docs/architecture/flash-budget.md",
+    "docs/architecture/idf-production-migration.md",
     "docs/hardware/charging-state.md",
     "docs/bluetooth/m3-stack-decision.md",
   ];
@@ -281,6 +286,7 @@ test("M4 ESP-IDF BT adapters present", () => {
     "components/bluetooth/esp_idf_ble_hid_peripheral.cpp",
     "docs/licensing/bluetooth-stack-matrix.md",
     "docs/bluetooth/esp-idf-dual-mode.md",
+    "docs/bluetooth/esp-idf-dual-mode-spike.md",
   ];
   for (const rel of need) {
     assert.ok(existsSync(join(ROOT, rel)), rel);
@@ -291,9 +297,21 @@ test("M4 ESP-IDF BT adapters present", () => {
   assert.match(matrix, /BTstack required\?\*\* \*\*No/i);
 });
 
-test("version is 0.3.0-dev", () => {
+test("version is 0.4.0-dev", () => {
   const ver = readFileSync(join(ROOT, "include/blueshift/version.h"), "utf8");
-  assert.match(ver, /0\.3\.0-dev/);
+  assert.match(ver, /0\.4\.0-dev/);
+});
+
+test("IDF production envs and partitions present", () => {
+  const ini = readFileSync(join(ROOT, "platformio.ini"), "utf8");
+  assert.match(ini, /\[env:t-lion-idf-debug\]/);
+  assert.match(ini, /\[env:t-lion-idf-release\]/);
+  assert.match(ini, /framework-espidf @ 3\.50301\.0/);
+  assert.ok(existsSync(join(ROOT, "partitions/t-lion-no-ota.csv")));
+  assert.ok(existsSync(join(ROOT, "partitions/t-lion-ota.csv")));
+  assert.ok(existsSync(join(ROOT, "partitions/t-lion-debug.csv")));
+  assert.ok(existsSync(join(ROOT, "sdkconfig.d/defaults.common")));
+  assert.ok(existsSync(join(ROOT, "src/idf_app/app_main.cpp")));
 });
 
 test("third party lists ThingPulse", () => {

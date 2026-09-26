@@ -6,6 +6,7 @@
 #include "bluetooth/classic_hid_host.h"
 #include "bluetooth/esp_idf_ble_hid_peripheral.h"
 #include "bluetooth/esp_idf_classic_hid_host.h"
+#include "bluetooth/reconnect_policy.h"
 #include "bridge/bridge_core.h"
 #include "display/display.h"
 #include "display/framebuffer_display.h"
@@ -15,11 +16,15 @@
 #include "input/navigation_input.h"
 #include "power/power_policy.h"
 #include "storage/config_store.h"
+#include "storage/device_store.h"
 #include "ui/ui_controller.h"
 #include "ui/ui_renderer.h"
 
 #if defined(ARDUINO) && defined(BLUESHIFT_BOARD_T_LION)
 #include "display/ssd1306_display.h"
+#endif
+#if defined(ESP_PLATFORM) && !defined(ARDUINO) && defined(BLUESHIFT_NATIVE_ESP_IDF)
+#include "display/idf_ssd1306_display.h"
 #endif
 
 namespace blueshift {
@@ -44,6 +49,9 @@ public:
     ConfigStore &configStore() {
         return configStore_;
     }
+    DeviceStore &deviceStore() {
+        return deviceStore_;
+    }
 
 private:
     void bootSerial();
@@ -56,12 +64,16 @@ private:
     void attemptReconnect();
     void handleNav(uint32_t nowMs);
     void refreshUiModel();
+    void sampleBattery(uint32_t nowMs);
+    void tickReconnect(uint32_t nowMs);
 
     t_lion::BoardConfig board_{};
     ConfigStore configStore_{};
+    DeviceStore deviceStore_{};
     AppConfigV1 config_{};
     BridgeCore bridge_{};
     PowerPolicy power_{};
+    ReconnectPolicy reconnect_{};
     UiController ui_{};
     UiRenderer renderer_{};
     UiRenderModel renderModel_{};
@@ -76,6 +88,10 @@ private:
     Ssd1306Display ssd1306_{board_};
     GpioNavigationBackend gpioNav_{board_};
     AdcBatteryBackend adcBat_{board_};
+#elif defined(ESP_PLATFORM) && !defined(ARDUINO) && defined(BLUESHIFT_NATIVE_ESP_IDF)
+    IdfSsd1306Display idfOled_{board_};
+    GpioNavigationBackend gpioNav_{board_};
+    AdcBatteryBackend adcBat_{board_};
 #endif
     Display *display_ = nullptr;
     bool displayOk_ = false;
@@ -84,6 +100,7 @@ private:
     bool classicOk_ = false;
     bool bleOk_ = false;
     uint32_t lastUiMs_ = 0;
+    uint32_t lastBatteryMs_ = 0;
     BridgeState lastBridgeState_ = BridgeState::Boot;
 };
 

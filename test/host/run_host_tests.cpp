@@ -16,9 +16,14 @@
 #include "input/navigation_input.h"
 #include "storage/app_config.h"
 #include "storage/config_store.h"
+#include "storage/device_store.h"
 #include "storage/factory_reset.h"
 #include "ui/ui_controller.h"
 #include "ui/ui_renderer.h"
+#include "bluetooth/bluetooth_error.h"
+#include "bluetooth/reconnect_policy.h"
+#include "diagnostics/hw_revision.h"
+#include "diagnostics/self_test.h"
 
 static int g_failures = 0;
 
@@ -269,16 +274,66 @@ static void testConfigAndFactoryReset() {
     cfg.base.locale = 9;
     CHECK(!blueshift::validateConfigV1(cfg));
 
+    blueshift::DeviceStore devices;
+    CHECK(devices.begin());
+    blueshift::KnownDeviceMeta meta{};
+    meta.used = true;
+    meta.kind = blueshift::KnownDeviceKind::ClassicInput;
+    std::snprintf(meta.friendlyName, sizeof(meta.friendlyName), "SN30");
+    std::snprintf(meta.profileId, sizeof(meta.profileId), "%s",
+                  blueshift::profiles::kSn30Pro.id);
+    CHECK(devices.upsert(meta));
+    CHECK(devices.findClassicInput() != nullptr);
+
     blueshift::ClassicHidHostSpike classic;
     blueshift::BleHidPeripheralSpike ble;
     classic.start();
     ble.start();
     blueshift::FactoryResetHooks hooks;
     hooks.config = &store;
+    hooks.devices = &devices;
     hooks.classic = &classic;
     hooks.ble = &ble;
-    auto r = blueshift::FactoryReset::run(hooks);
+    auto r = blueshift::FactoryReset::run(hooks, blueshift::FactoryResetScope::FullBlueShift);
     CHECK(r.ok);
+    CHECK(devices.findClassicInput() == nullptr);
+}
+
+static void testReconnectPolicy() {
+    blueshift::ReconnectPolicyConfig cfg;
+    cfg.maxAttempts = 3;
+    cfg.initialDelayMs = 100;
+    cfg.maxDelayMs = 400;
+    blueshift::ReconnectPolicy p(cfg);
+    CHECK(p.shouldAttempt(0));
+    p.recordFailure(0);
+    CHECK(!p.shouldAttempt(50));
+    CHECK(p.shouldAttempt(100));
+    p.recordFailure(100);
+    p.recordFailure(300);
+    CHECK(p.exhausted());
+    p.reset();
+    CHECK(!p.exhausted());
+}
+
+static void testBluetoothErrorNames() {
+    CHECK(std::strcmp(blueshift::bluetoothErrorName(blueshift::BluetoothError::None), "None") ==
+          0);
+    CHECK(std::strcmp(blueshift::bluetoothErrorName(
+                          blueshift::BluetoothError::ControllerInitFailed),
+                      "ControllerInitFailed") == 0);
+}
+
+static void testSelfTestAndHwCompare() {
+    blueshift::SelfTestReport r{};
+    blueshift::selfTestSet(r, blueshift::SelfTestId::Oled, blueshift::SelfTestStatus::Ok, "ok");
+    CHECK(r.entries[0].status == blueshift::SelfTestStatus::Ok);
+    blueshift::ChipInfoReport chip{};
+    chip.model = "ESP32";
+    chip.flashSizeBytes = 4u * 1024u * 1024u;
+    auto cmp = blueshift::compareDocumentedVsDetected(chip);
+    CHECK(cmp.socLooksEsp32);
+    CHECK(cmp.flashMatchesAssumed);
 }
 
 static void testI18n() {
@@ -305,6 +360,9 @@ int main() {
     testNavigation();
     testUiRenderer();
     testConfigAndFactoryReset();
+    testReconnectPolicy();
+    testBluetoothErrorNames();
+    testSelfTestAndHwCompare();
     testI18n();
     if (g_failures != 0) {
         std::printf("%d failure(s)\n", g_failures);

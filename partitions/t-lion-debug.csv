@@ -1,0 +1,7 @@
+# Name,   Type, SubType, Offset,  Size, Flags
+# Development layout: large factory app, room for coredump, no OTA.
+nvs,      data, nvs,     0x9000,  0x8000,
+phy_init, data, phy,     0x11000, 0x1000,
+factory,  app,  factory, 0x20000, 0x220000,
+coredump, data, coredump,0x240000,0x10000,
+nvs_key,  data, nvs_keys,0x250000,0x1000,

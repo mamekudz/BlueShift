@@ -1,6 +1,29 @@
-# Bridge disconnect / reconnect policy (Milestone 2)
+# Bridge disconnect / reconnect policy
 
-Language-neutral machine policy. UI strings come from i18x.
+Language-neutral machine policy. UI strings come from i18x.  
+**Status:** DOCUMENTED / IMPLEMENTED_UNVERIFIED — not PHYSICALLY VERIFIED.
+
+## Boot sequence
+
+1. Initialize NVS / BluetoothPlatform (BTDM + Bluedroid)
+2. Start Classic HID Host + BLE HID Device adapters
+3. Attempt **known Classic input** reconnect (from `DeviceStore`, bounded)
+4. Expose BLE output (advertise / reconnect host as configured)
+5. Update UI / self-test
+6. Fall back to pairing UI only when no known device or reconnect exhausted
+
+## Bounded retry / backoff
+
+`ReconnectPolicy` defaults:
+
+| Parameter | Default |
+| --- | --- |
+| maxAttempts | 5 |
+| initialDelayMs | 1000 |
+| maxDelayMs | 30000 |
+| pairingTimeoutMs | from config (60 s) |
+
+No endless rapid reconnect loops.
 
 ## Input (Classic) disappears
 
@@ -30,6 +53,19 @@ Language-neutral machine policy. UI strings come from i18x.
 
 Never allow disconnected output to grow queues without bound.
 
+Bluetooth callbacks must not render OLED, write config, or allocate large buffers — translate to bounded project queues/state.
+
 ## Pairing
 
-INPUT pairing (Classic) and OUTPUT pairing (BLE) are separate UI screens and separate FSM events. Do not conflate.
+INPUT pairing (Classic) and OUTPUT pairing (BLE) are separate UI screens and separate FSM events. Timeouts return UI to a stable Idle/connected state.
+
+## Task model (native ESP-IDF)
+
+Minimal ownership:
+
+| Owner | Role |
+| --- | --- |
+| Bluedroid / esp_hid | Stack callbacks (capture only) |
+| `bs_app` FreeRTOS task | BridgeCore, UI, battery, reconnect ticks (~10 ms) |
+
+Do **not** create one FreeRTOS task per component.

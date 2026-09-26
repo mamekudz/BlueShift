@@ -24,7 +24,7 @@
 
 Paket-/Repo-Identifier (ASCII): `blueshift` — öffentlicher Wortlaut **BlueShift™** (Wortmarke; nicht in technischen Identifiern). Details: [`docs/licensing/branding-policy.md`](docs/licensing/branding-policy.md).
 
-**Status:** Milestone 3 — maximale Vorab-Implementierung (`0.3.0-dev`). Board-Layer, SSD1306-Backend, OLED-UI, Nav/ADC, NVS, Factory-Reset, Classic/BLE-Spikes, Bridge-Simulation und Host-Tests sind **IMPLEMENTED_UNVERIFIED**. Native ESP-IDF Dual-Mode-Bluetooth-Backend: **Compile/Link verifiziert**, physische Verifikation ausstehend. Physische Hardware ist **noch nicht** verfügbar — daher **nichts physisch VERIFIED**.
+**Status:** Milestone 4 — native ESP-IDF Produktionsmigration (`0.4.0-dev`). Arduino-Envs bleiben LEGACY-Baseline. Produktionskandidaten `t-lion-idf-debug` / `t-lion-idf-release` sind **LINK VERIFIED** (ESP-IDF 5.3.1 Bluedroid BTDM). OLED/Nav/ADC/NVS/Bridge/UI bleiben **IMPLEMENTED_UNVERIFIED**. Physisches T-Lion **noch nicht** verfügbar — **nichts PHYSICALLY VERIFIED**.
 
 ---
 
@@ -154,7 +154,7 @@ Generated from [`docs/compatibility/devices.json`](docs/compatibility/devices.js
 ```text
 platformio.ini   — skeleton / t-lion-debug / t-lion-release / native
 src/main.cpp     — Boot-Skeleton + dokumentierte Pin-Logs
-include/blueshift/version.h  — 0.3.0-dev
+include/blueshift/version.h  — 0.4.0-dev
 ```
 
 Gepinnt: `espressif32 @ 6.9.0`. Bluetooth-Stacks noch **nicht** als `lib_deps`.
@@ -228,7 +228,7 @@ Dieses Repository nutzt den **µGulp**-Automatisierungsworkflow für:
 | Classic BT / BLE Stack in Firmware | PLANNED (Recherche abgeschlossen) |
 | Physische Verifikation | ausstehend |
 
-Version: **0.3.0-dev**. Nächster physischer Schritt: **T-LION HARDWARE BRING-UP**.
+Version: **0.4.0-dev**. Nächster physischer Schritt: **T-LION HARDWARE BRING-UP** (`t-lion-idf-debug`).
 
 ---
 

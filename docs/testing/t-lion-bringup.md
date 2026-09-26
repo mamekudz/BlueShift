@@ -1,9 +1,38 @@
 # T-Lion physical bring-up plan
 
 **Status:** PLANNED — board not available.  
-**Prerequisite:** Native ESP-IDF dual-mode compile/link proof (`docs/bluetooth/esp-idf-dual-mode-spike.md`).
+**Prerequisite:** Native ESP-IDF dual-mode spike + production candidate LINK VERIFIED  
+(`docs/bluetooth/esp-idf-dual-mode-spike.md`, `docs/architecture/idf-production-migration.md`).
+
+Flash production firmware with:
+
+```text
+pio run -e t-lion-idf-debug -t upload
+```
+
+or `t-lion-idf-release` for the no-OTA partition layout.
 
 Do not mark any step PHYSICALLY VERIFIED until executed on hardware.
+
+---
+
+## Boot serial expectations (IMPLEMENTED_UNVERIFIED)
+
+Concise lines such as:
+
+```text
+[BOOT] BlueShift version=0.4.0-dev
+[BOOT] framework=ESP-IDF 5.3.1
+[BOOT] chip=... flash=... psram=...
+[OLED] ...
+[NAV] ...
+[BATTERY] ...
+[BT-CLASSIC] ...
+[BLE] ...
+[DIAG] hw DOCUMENTED ... / DETECTED ...
+```
+
+Compare DOCUMENTED vs DETECTED; do not auto-rewrite sdkconfig from runtime.
 
 ---
 

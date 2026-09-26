@@ -3,8 +3,12 @@
 #include <cstdarg>
 #include <cstdio>
 
+#if defined(ESP_PLATFORM) && !defined(ARDUINO)
+#include "esp_log.h"
+#endif
+
 // Structured logging categories + levels. Host-safe (stdio).
-// Firmware may later route to Serial without changing call sites.
+// Project categories remain the source of truth; ESP-IDF log ceiling mirrors setLogMaxLevel.
 
 namespace blueshift {
 
@@ -27,6 +31,28 @@ inline LogLevel &logMaxLevelRef() {
 
 inline void setLogMaxLevel(LogLevel level) {
     logMaxLevelRef() = level;
+#if defined(ESP_PLATFORM) && !defined(ARDUINO)
+    // Keep ESP-IDF esp_log ceiling aligned with project level (single logging policy).
+    esp_log_level_t idf = ESP_LOG_INFO;
+    switch (level) {
+    case LogLevel::Error:
+        idf = ESP_LOG_ERROR;
+        break;
+    case LogLevel::Warn:
+        idf = ESP_LOG_WARN;
+        break;
+    case LogLevel::Info:
+        idf = ESP_LOG_INFO;
+        break;
+    case LogLevel::Debug:
+        idf = ESP_LOG_DEBUG;
+        break;
+    case LogLevel::Trace:
+        idf = ESP_LOG_VERBOSE;
+        break;
+    }
+    esp_log_level_set("*", idf);
+#endif
 }
 
 inline void logWrite(LogLevel level, const char *tag, const char *fmt, ...) {

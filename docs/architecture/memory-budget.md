@@ -1,56 +1,49 @@
-# Memory budget (Milestone 3)
+# Memory budget — BlueShift
 
-**Status:** ESTIMATED / MEASURED-AT-BUILD where PlatformIO size output is available.
-Nothing here is a physical runtime claim.
+**Status:** BUILD MEASURED where noted; runtime free heap **not** claimed until physical execution.  
+**PHYSICAL VERIFIED: none.**
 
 ## Target
 
-LILYGO T-Lion — ESP32-WROVER with PSRAM (DOCUMENTED / IMPLEMENTED_UNVERIFIED board JSON).
+LILYGO T-Lion — ESP32-WROVER with PSRAM (DOCUMENTED module / ASSUMED 8 MB PSRAM).
 
-## Methodology
+## PSRAM policy
 
-1. Build `t-lion-debug` / `skeleton` and capture `.pio` size summary.
-2. Compare flash / DRAM before vs after Bluetooth dependencies.
-3. Do not enable NimBLE + Classic Bluedroid dual-host until EspBle/Arduino 3.x path is chosen.
+Core Bluetooth bridging must **not** depend on PSRAM unless evidence proves otherwise.
 
-## Static application allocations (order of magnitude)
+- Prefer internal DRAM for HID queues, bridge state, OLED 1 KiB framebuffer.
+- PSRAM may later hold non-critical diagnostics/UI buffers.
+- Firmware should continue if PSRAM is unavailable or disabled.
+
+## Static / linker allocations (order of magnitude)
 
 | Item | Size | Notes |
 | --- | --- | --- |
-| SSD1306 framebuffer (library-owned) | ~1 KiB | 128×64 / 8 |
-| `FramebufferDisplay` host mirror | 1024 B | tests / skeleton |
-| Bridge / UI / config objects | < 2 KiB | stack + BSS ASSUMED |
+| SSD1306 framebuffer | 1024 B | project-owned IDF backend |
+| Bridge / UI / config / device meta | few KiB | BSS + stacks ASSUMED |
 | HID report temps | tens of bytes | no per-report heap |
+| Bounded queues | fixed capacity | DropOldest / KeepNewest |
 
-## Dependency flash impact (EXPECTED)
+## Latest build numbers (LINKER / BUILD MEASURED)
 
-| Configuration | Flash impact | Status |
-| --- | --- | --- |
-| App + ThingPulse SSD1306 | moderate | linked on `t-lion-*` |
-| + NimBLE-Arduino HID | large (100s of KiB) | **not default** — optional flag |
-| + EspBle dual-host | very large | blocked on Arduino 2.x / platform 6.9.0 |
-| + Bluepad32/BTstack | very large | not linked |
+| Env | Flash used | DRAM used | Notes | Measured |
+| --- | --- | --- | --- | --- |
+| skeleton (M4 adapters, BT gated off) | 291873 / 1310720 (22.3%) | 23184 / 327680 (7.1%) | Arduino LEGACY | 2026-09-25 |
+| t-lion-debug (M4 + BTDM platform) | 1137381 / 1310720 (86.8%) | 41444 / 327680 (12.6%) | Arduino LEGACY | 2026-09-25 |
+| t-lion-idf-spike (dual) | 914852 / 1048576 (87.2%) | 44476 / 327680 (13.6%) | 1 MiB spike slot | 2026-09-26 |
+| **t-lion-idf-debug** | **1026875 / 2228224 (46.1%)** | **48048 / 327680 (14.7%)** | production candidate | 2026-09-26 |
+| **t-lion-idf-release** | **852596 / 1966080 (43.4%)** | **46392 / 327680 (14.2%)** | production candidate | 2026-09-26 |
 
-## PSRAM
+## Runtime (pending physical)
 
-`BOARD_HAS_PSRAM` set for T-Lion envs. Bluetooth stacks may or may not use PSRAM — ASSUMED until measurement.
+| Item | Status |
+| --- | --- |
+| free heap | DETECTED at boot via `captureChipInfo` — claim only after board |
+| min free heap | same |
+| Bluedroid runtime heap | UNKNOWN until bring-up |
 
 ## Policy
 
 - Prefer fixed buffers and bounded queues.
 - No heap allocation in HID callbacks.
-- If a stack does not fit, stop integration and keep mocks/core/UI (see CLAUDE.md / Milestone 3 §41–42).
-
-## Latest build numbers
-
-| Env | Flash used | DRAM used | Notes | Measured |
-| --- | --- | --- | --- | --- |
-| skeleton (pre-M4) | 290569 / 1310720 (22.2%) | 23160 / 327680 (7.1%) | OLED-less baseline | 2026-09-25 |
-| skeleton (M4 adapters, BT gated off) | 291873 / 1310720 (22.3%) | 23184 / 327680 (7.1%) | no Bluedroid link | 2026-09-25 |
-| t-lion-debug (pre-M4 / OLED only) | 341273 / 1310720 (26.0%) | 23960 / 327680 (7.3%) | ThingPulse | 2026-09-25 |
-| t-lion-debug (M4 + BTDM platform) | 1137381 / 1310720 (86.8%) | 41444 / 327680 (12.6%) | Bluedroid linked | 2026-09-25 LINKER |
-| **t-lion-idf-spike (dual Classic+BLE)** | **914852 / 1048576 (87.2%)** | **44476 / 327680 (13.6%)** | ESP-IDF 5.3.1 Bluedroid BTDM + HID Host + esp_hid; SINGLE_APP_LARGE | 2026-09-26 LINKER |
-
-**BUILD-TIME / LINKER DATA only** — not physical runtime.  
-Arduino T-Lion uses a ~1.25 MiB app window; IDF spike uses SINGLE_APP_LARGE (~1 MiB). Figures are not 1:1 comparable but both show Bluedroid dual-mode is flash-heavy.
-
+- One app loop task (`bs_app`) — not one task per component.

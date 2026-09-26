@@ -1,0 +1,9 @@
+# Name,   Type, SubType, Offset,  Size, Flags
+# Large single-app layout for BlueShift dual-mode Bluedroid (~900 KiB+).
+# No OTA — USB update is sufficient for a dedicated adapter (see docs/architecture/flash-budget.md).
+# Flash assumption: 4 MB DOCUMENTED/ASSUMED for T-Lion WROVER — PHYSICAL UNVERIFIED.
+nvs,      data, nvs,     0x9000,  0x6000,
+phy_init, data, phy,     0xf000,  0x1000,
+factory,  app,  factory, 0x10000, 0x1E0000,
+nvs_key,  data, nvs_keys,0x1F0000,0x1000,
+coredump, data, coredump,0x1F1000,0xF000,
