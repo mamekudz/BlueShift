@@ -1,18 +1,22 @@
 // ===========================================
-// readme-compose.mjs — de-DE.src.md → README.md
+// readme-compose.mjs — locale .src.md → public READMEs
 // BlueShift — µGulp-style compose (aligned with esp2 / microGulp)
 // ===========================================
 //
-// Source (edit this):     dev/docs/readme/de-DE.src.md
-// Optional baseline:      dev/docs/readme/de-DE.md
-// Later translations:     dev/docs/readme/<lid>.md
-// Public Git file:        README.md
+// Sources (edit these):
+//   dev/docs/readme/en-US.src.md  →  README.md          (GitHub default)
+//   dev/docs/readme/de-DE.src.md  →  README.de-DE.md
+// Optional filtered baselines:
+//   dev/docs/readme/en-US.md
+//   dev/docs/readme/de-DE.md
 //
 // Channel markers (outside fenced code):
 //   unmarked text       → published
 //   <!-- git … -->      → Git README only
 //   <!-- website … -->  → skipped for Git README
 //   <!-- note … -->     → maintainer only (never published)
+//
+// Marker COMPATIBILITY_TABLE is replaced from docs/compatibility/devices.json.
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -21,13 +25,28 @@ import { InjectCompatibilityTable } from "./compatibility-table.mjs";
 
 const PROJECT_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const README_DIR = join(PROJECT_ROOT, "dev", "docs", "readme");
-const SOURCE = join(README_DIR, "de-DE.src.md");
-const BASELINE = join(README_DIR, "de-DE.md");
-const PUBLIC_README = join(PROJECT_ROOT, "README.md");
 
-export const README_SOURCE_RELATIVE = "dev/docs/readme/de-DE.src.md";
+/** @deprecated use README_SOURCES — kept for older callers */
+export const README_SOURCE_RELATIVE = "dev/docs/readme/en-US.src.md";
+
+export const README_SOURCES = Object.freeze({
+  "en-US": {
+    sourceRel: "dev/docs/readme/en-US.src.md",
+    baselineRel: "dev/docs/readme/en-US.md",
+    outputRel: "README.md",
+  },
+  "de-DE": {
+    sourceRel: "dev/docs/readme/de-DE.src.md",
+    baselineRel: "dev/docs/readme/de-DE.md",
+    outputRel: "README.de-DE.md",
+  },
+});
+
+/** Canonical µGulp-ready badge path (language-independent). */
+export const MICROGULP_READY_ASSET = "docs/assets/microgulp-ready.png";
 
 /**
+ * Strip HTML channel comment blocks outside fenced code.
  * @param {string} _text
  * @param {"git" | "website"} _channel
  */
@@ -103,13 +122,35 @@ export function FilterChannels(_text, _channel = "git") {
 }
 
 /**
- * @param {{ root?: string }} [_opts]
+ * @param {string} path
+ * @param {string} next
+ * @returns {boolean} whether file changed
  */
-export function ComposeReadme(_opts = {}) {
+function writeIfChanged(path, next) {
+  const prev = existsSync(path) ? readFileSync(path, "utf8") : null;
+  if (prev === next) {
+    return false;
+  }
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, next, "utf8");
+  return true;
+}
+
+/**
+ * Compose one locale README from its .src.md. Deterministic.
+ * @param {{ root?: string, locale?: "en-US" | "de-DE" }} [_opts]
+ */
+export function ComposeReadmeLocale(_opts = {}) {
   const root = _opts.root ?? PROJECT_ROOT;
-  const sourcePath = join(root, "dev", "docs", "readme", "de-DE.src.md");
-  const baselinePath = join(root, "dev", "docs", "readme", "de-DE.md");
-  const outPath = join(root, "README.md");
+  const locale = _opts.locale ?? "en-US";
+  const cfg = README_SOURCES[locale];
+  if (!cfg) {
+    throw new Error(`Unknown README locale: ${locale}`);
+  }
+
+  const sourcePath = join(root, cfg.sourceRel);
+  const baselinePath = join(root, cfg.baselineRel);
+  const outPath = join(root, cfg.outputRel);
 
   if (!existsSync(sourcePath)) {
     throw new Error(`README source missing: ${sourcePath}`);
@@ -119,25 +160,48 @@ export function ComposeReadme(_opts = {}) {
   let composed = FilterChannels(raw, "git");
   composed = InjectCompatibilityTable(composed, root);
 
-  mkdirSync(dirname(baselinePath), { recursive: true });
   let changed = false;
-  for (const [path, next] of [
-    [baselinePath, composed],
-    [outPath, composed],
-  ]) {
-    const prev = existsSync(path) ? readFileSync(path, "utf8") : null;
-    if (prev !== next) {
-      writeFileSync(path, next, "utf8");
-      changed = true;
-    }
-  }
+  if (writeIfChanged(baselinePath, composed)) changed = true;
+  if (writeIfChanged(outPath, composed)) changed = true;
 
   return {
+    locale,
     source: sourcePath,
+    baseline: baselinePath,
     output: outPath,
     bytes: Buffer.byteLength(composed, "utf8"),
     changed,
   };
 }
 
-export { SOURCE, BASELINE, PUBLIC_README, README_DIR, PROJECT_ROOT };
+/**
+ * Compose all public README locales. Deterministic.
+ * @param {{ root?: string }} [_opts]
+ */
+export function ComposeReadme(_opts = {}) {
+  const root = _opts.root ?? PROJECT_ROOT;
+  const results = [];
+  let changed = false;
+  let bytes = 0;
+  for (const locale of Object.keys(README_SOURCES)) {
+    const r = ComposeReadmeLocale({ root, locale });
+    results.push(r);
+    if (r.changed) changed = true;
+    bytes += r.bytes;
+  }
+  return {
+    source: join(root, README_SOURCES["en-US"].sourceRel),
+    output: join(root, "README.md"),
+    bytes,
+    changed,
+    results,
+  };
+}
+
+export { README_DIR, PROJECT_ROOT };
+
+const SOURCE = join(README_DIR, "en-US.src.md");
+const BASELINE = join(README_DIR, "en-US.md");
+const PUBLIC_README = join(PROJECT_ROOT, "README.md");
+
+export { SOURCE, BASELINE, PUBLIC_README };

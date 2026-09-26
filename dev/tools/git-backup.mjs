@@ -10,6 +10,7 @@ import { join } from "node:path";
 export const GIT_BACKUP_ENSURE_PATHS = Object.freeze([
   "CLAUDE.md",
   "README.md",
+  "README.de-DE.md",
   "THIRD_PARTY_LICENSES.md",
   "platformio.ini",
   "package.json",

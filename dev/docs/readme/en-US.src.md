@@ -1,3 +1,10 @@
+<!-- note
+Maintained English source for the BlueShift README. Edit this file and de-DE.src.md.
+Then: npx gulp docs  → generates README.md / README.de-DE.md and locale baselines.
+The COMPATIBILITY_TABLE marker is replaced from docs/compatibility/devices.json.
+website blocks may be added later; unmarked text appears in the Git README.
+-->
+
 # BlueShift™
 
 **English** | [Deutsch](README.de-DE.md)
@@ -121,29 +128,7 @@ Stack decision: [`docs/bluetooth/m3-stack-decision.md`](docs/bluetooth/m3-stack-
 
 One structured source: [`docs/compatibility/devices.json`](docs/compatibility/devices.json).
 
-Generated from [`docs/compatibility/devices.json`](docs/compatibility/devices.json). Do not edit this table by hand.
-
-**BlueShift** = Classic HID input → BLE HID output bridge candidacy. **ESP][** = direct wireless use on the ESP32-S3 ESP][ project. These are different questions.
-
-| Device | Transport | BlueShift | ESP][ direct | Physical test | Notes |
-| --- | --- | --- | --- | --- | --- |
-| 8BitDo SN30 Pro | classic-br-edr | CANDIDATE | INCOMPATIBLE | NONE | Do not claim BlueShift VERIFIED until Classic HID path is physically tested on T-Lion. |
-| SteelSeries Nimbus 69070 | classic-br-edr | CANDIDATE | INCOMPATIBLE | PARTIAL | Classic-path feasibility for BlueShift is PLANNED / CANDIDATE — not yet verified on T-Lion. |
-| Microsoft Xbox Controller 1697 | proprietary-wireless, usb | USB_ONLY | INCOMPATIBLE | NONE | USB-oriented; out of scope for Classic→BLE bridge without contrary evidence. |
-| Terios / ShanWan T3 BM-769 | ble | NOT_APPLICABLE | CANDIDATE | PENDING | Ordered / physical verification pending for ESP][. Not a primary BlueShift Classic-input target. |
-| VR PARK Controller | ble | NOT_APPLICABLE | CANDIDATE | PARTIAL | ESP][ path: BLE discovered. BlueShift Classic bridge is not the primary interest for this device. |
-
-### Evidence / references
-
-- bluepad32SupportedGamepads: https://bluepad32.readthedocs.io/en/latest/supported_gamepads/
-- bluepad32Issue154: https://github.com/ricardoquesada/bluepad32/issues/154
-- esp32KeyBridge: https://github.com/tanakamasayuki/ESP32KeyBridge
-- **8BitDo SN30 Pro**: Classic Bluetooth / BR/EDR gamepad; candidate future BlueShift Classic HID input. Not suitable for direct ESP32-S3 BLE wireless use on ESP][. ([link](https://bluepad32.readthedocs.io/en/latest/supported_gamepads/))
-- **SteelSeries Nimbus**: Physically tested against ESP][ BLE scanner: visible to Windows Bluetooth, NOT visible in ESP32-S3 BLE scan. Therefore direct ESP][ BLE wireless: INCOMPATIBLE. Candidate BlueShift Classic input.
-- **Microsoft Xbox Controller**: No normal Bluetooth Classic/BLE HID for wireless use. Do not classify as BlueShift Classic HID candidate without new evidence.
-- **Terios / ShanWan T3**: Inexpensive BLE controller discussion relevant to direct ESP][ use (not primary BlueShift Classic-input target). ([link](https://github.com/ricardoquesada/bluepad32/issues/154))
-- **VR PARK Controller**: Physically visible in ESP32-S3 BLE scan on ESP][. Deeper HID/GATT analysis pending. Direct ESP][ candidate.
-
+<!-- COMPATIBILITY_TABLE -->
 
 ---
 

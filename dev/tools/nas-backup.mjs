@@ -32,6 +32,7 @@ export const NAS_BACKUP_INCLUDE_DIRS = Object.freeze([
 export const NAS_BACKUP_INCLUDE_FILES = Object.freeze([
   "CLAUDE.md",
   "README.md",
+  "README.de-DE.md",
   "THIRD_PARTY_LICENSES.md",
   "platformio.ini",
   "package.json",

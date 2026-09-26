@@ -21,7 +21,13 @@ import {
   GIT_BACKUP_NEVER_STAGE,
   RunGitBackup,
 } from "./git-backup.mjs";
-import { ComposeReadme, FilterChannels, README_SOURCE_RELATIVE } from "./readme-compose.mjs";
+import {
+  ComposeReadme,
+  FilterChannels,
+  MICROGULP_READY_ASSET,
+  README_SOURCE_RELATIVE,
+  README_SOURCES,
+} from "./readme-compose.mjs";
 import {
   LoadCompatibilityDb,
   RenderCompatibilityTables,
@@ -90,19 +96,48 @@ test("readme filter strips note/website and is deterministic", () => {
   assert.doesNotMatch(a, /drop/);
 });
 
+test("canonical µGulp-ready asset exists once", () => {
+  assert.equal(MICROGULP_READY_ASSET, "docs/assets/microgulp-ready.png");
+  assert.ok(existsSync(join(ROOT, MICROGULP_READY_ASSET)));
+  assert.equal(existsSync(join(ROOT, "docs/assets/microgulp-ready-en.png")), false);
+  assert.equal(existsSync(join(ROOT, "docs/assets/microgulp-ready-de.png")), false);
+});
+
 test("ComposeReadme injects compatibility table and is idempotent", () => {
-  assert.equal(README_SOURCE_RELATIVE, "dev/docs/readme/de-DE.src.md");
+  assert.equal(README_SOURCE_RELATIVE, "dev/docs/readme/en-US.src.md");
+  assert.equal(README_SOURCES["en-US"].outputRel, "README.md");
+  assert.equal(README_SOURCES["de-DE"].outputRel, "README.de-DE.md");
   const first = ComposeReadme({ root: ROOT });
   const second = ComposeReadme({ root: ROOT });
   assert.equal(second.changed, false);
   assert.equal(first.bytes, second.bytes);
-  const readme = readFileSync(join(ROOT, "README.md"), "utf8");
-  assert.match(readme, /BlueShift/);
-  assert.match(readme, /microgulp-ready\.png/);
-  assert.match(readme, /blueshift-logo\.png/);
-  assert.doesNotMatch(readme, new RegExp(COMPAT_TABLE_MARKER));
-  assert.match(readme, /SN30 Pro/);
-  assert.match(readme, /Nimbus/);
+  assert.equal(first.results?.length, 2);
+
+  const readmeEn = readFileSync(join(ROOT, "README.md"), "utf8");
+  const readmeDe = readFileSync(join(ROOT, "README.de-DE.md"), "utf8");
+
+  for (const readme of [readmeEn, readmeDe]) {
+    assert.match(readme, /BlueShift/);
+    assert.match(readme, /microgulp-ready\.png/);
+    assert.match(readme, /blueshift-logo\.png/);
+    assert.match(readme, /## µGulp-ready/);
+    assert.match(readme, /Work in Progress/);
+    assert.doesNotMatch(readme, new RegExp(COMPAT_TABLE_MARKER));
+    assert.match(readme, /SN30 Pro/);
+    assert.match(readme, /Nimbus/);
+    assert.equal(
+      (readme.match(/microgulp-ready\.png/g) || []).length,
+      2,
+      "badge image once in header + once in µGulp-ready section"
+    );
+  }
+
+  assert.match(readmeEn, /\*\*English\*\*.*README\.de-DE\.md/s);
+  assert.match(readmeDe, /README\.md.*\*\*Deutsch\*\*/s);
+  assert.match(readmeEn, /https:\/\/microgulp\.dev\/en\/ready\//);
+  assert.match(readmeDe, /https:\/\/microgulp\.dev\/de\/ready\//);
+  assert.match(readmeEn, /documentation generation/);
+  assert.match(readmeDe, /Dokumentationsgenerierung/);
 });
 
 test("compatibility db loads expected initial devices", () => {
@@ -127,6 +162,7 @@ test("NAS mirror includes CLAUDE.md and skips .pio/node_modules", async () => {
     assert.ok(existsSync(join(dest, "CLAUDE.md")), "CLAUDE.md copied");
     assert.ok(existsSync(join(dest, "platformio.ini")));
     assert.ok(existsSync(join(dest, "docs", "compatibility", "devices.json")));
+    assert.ok(existsSync(join(dest, "dev", "docs", "readme", "en-US.src.md")));
     assert.ok(existsSync(join(dest, "dev", "docs", "readme", "de-DE.src.md")));
     assert.equal(existsSync(join(dest, "node_modules")), false);
     assert.equal(existsSync(join(dest, ".pio")), false);

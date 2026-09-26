@@ -1,12 +1,14 @@
 <!-- note
-Pflegequelle der BlueShift-README. Nur diese Datei bearbeiten.
-Danach: npx gulp docs  → erzeugt README.md und de-DE.md
+Pflegequelle der deutschen BlueShift-README. Nur diese Datei und en-US.src.md bearbeiten.
+Danach: npx gulp docs  → erzeugt README.de-DE.md und aktualisiert die Baseline de-DE.md.
 Der Marker COMPATIBILITY_TABLE (HTML-Kommentar im Dokumentkörper) wird aus
 docs/compatibility/devices.json ersetzt.
 website-Blöcke können später ergänzt werden; unmarked Text erscheint in der Git-README.
 -->
 
 # BlueShift™
+
+[English](README.md) | **Deutsch**
 
 <p align="center">
   <img src="docs/assets/blueshift-logo.png" alt="BlueShift" width="420">
@@ -18,6 +20,12 @@ website-Blöcke können später ergänzt werden; unmarked Text erscheint in der 
   </a>
 </p>
 
+> **🚧 Work in Progress / In Arbeit**
+>
+> Dieses Projekt wird aktiv weiterentwickelt.
+> Hardware, Firmware, APIs, Dokumentation und Kompatibilität können sich ändern.
+> Nichts ist physisch VERIFIED, solange kein T-Lion getestet wurde.
+
 **Bringing Classic Bluetooth into the BLE era.**
 
 **BlueShift™** ist der Projekt- und Produktname von Meinolf Amekudzi — eine Bridge von **Classic Bluetooth HID** (BR/EDR) nach **BLE HID**, zunächst vorgesehen für das Board **LILYGO T-Lion**.
@@ -25,8 +33,6 @@ website-Blöcke können später ergänzt werden; unmarked Text erscheint in der 
 Paket-/Repo-Identifier (ASCII): `blueshift` — öffentlicher Wortlaut **BlueShift™** (Wortmarke; nicht in technischen Identifiern). Details: [`docs/licensing/branding-policy.md`](docs/licensing/branding-policy.md).
 
 **Status:** Milestone 3 — maximale Vorab-Implementierung (`0.3.0-dev`). Board-Layer, SSD1306-Backend, OLED-UI, Nav/ADC, NVS, Factory-Reset, Classic/BLE-Spikes, Bridge-Simulation und Host-Tests sind **IMPLEMENTED_UNVERIFIED**. Physische Hardware ist **noch nicht** verfügbar — daher **nichts physisch VERIFIED**.
-
-Dieses Repository ist **µGulp-ready** (Gulp-Tasks für Dokumentation, Formatierung und Backup; siehe [Entwicklung](#entwicklung)).
 
 ---
 
@@ -134,7 +140,7 @@ Eine strukturierte Quelle: [`docs/compatibility/devices.json`](docs/compatibilit
 ```text
 platformio.ini   — skeleton / t-lion-debug / t-lion-release / native
 src/main.cpp     — Boot-Skeleton + dokumentierte Pin-Logs
-include/blueshift/version.h  — 0.2.0-dev
+include/blueshift/version.h  — 0.3.0-dev
 ```
 
 Gepinnt: `espressif32 @ 6.9.0`. Bluetooth-Stacks noch **nicht** als `lib_deps`.
@@ -151,7 +157,7 @@ npm run test:infra
 ```bash
 npm install
 npx gulp help          # Default — sicher
-npx gulp docs          # README aus de-DE.src.md + Kompatibilitätstabelle
+npx gulp docs          # README.md + README.de-DE.md + Kompatibilitätstabelle
 npx gulp format        # clang-format (falls installiert)
 npx gulp format:check
 npx gulp check
@@ -177,9 +183,23 @@ Stub unter `components/i18n/` und Notizen in `docs/i18x/`. Locales: `en-US` (Fal
 
 ```bash
 npm run test:infra
+npm run test:host
 ```
 
-Host-Logik-Tests folgen später unter `test/` (HID-Normalisierung, Config, i18x, …) — ohne Fake-Bluetooth-Coverage.
+---
+
+## µGulp-ready
+
+Dieses Repository nutzt den **µGulp**-Automatisierungsworkflow für:
+
+- Dokumentationsgenerierung (`gulp docs`)
+- Lokalisierung der README-Quellen (en-US / de-DE)
+- Infrastruktur-Validierung (`npm run test:infra`)
+- C/C++-Formatierungshilfen (`gulp format` / `format:check`)
+- Git-Checkpoints (`gulp backup:git`)
+- NAS-Backup, sofern konfiguriert (`gulp backup` / `backup:nas` / `backup:all`)
+
+µGulp-Ready-Badge: offizielles Artwork unter `docs/assets/microgulp-ready.png` ([Regeln](https://microgulp.dev/de/ready/)).
 
 ---
 
@@ -194,7 +214,7 @@ Host-Logik-Tests folgen später unter `test/` (HID-Normalisierung, Config, i18x,
 | Classic BT / BLE Stack in Firmware | PLANNED (Recherche abgeschlossen) |
 | Physische Verifikation | ausstehend |
 
-Version: **0.2.0-dev**. Nächster physischer Schritt: **T-LION HARDWARE BRING-UP**.
+Version: **0.3.0-dev**. Nächster physischer Schritt: **T-LION HARDWARE BRING-UP**.
 
 ---
 
@@ -206,7 +226,7 @@ ESP][ ist der erste vorgesehene Abnehmer (ESP32-S3 Apple-II-Emulator-Projekt). B
 
 ## Roadmap (kurz)
 
-1. **Milestone 1** — Repository-Foundation ← aktuell
+1. **Milestone 1** — Repository-Foundation
 2. T-Lion Hardware-Bring-up (OLED, Buttons, Akku, Diagnose)
 3. Classic HID Input (ein Gerät, ein Profil)
 4. BLE HID Output + minimale Bridge
@@ -245,9 +265,6 @@ Marken-/Logo-Rechte sind von der Softwarelizenz getrennt; siehe
 
 Wortmarke: **BlueShift™** (nicht ®). Grafisches Logo: Entwurf —
 Markenbehandlung **UNDECIDED**.
-
-µGulp-Ready-Badge: offizielles Artwork unter `docs/assets/microgulp-ready.png`
-([Regeln](https://microgulp.dev/de/ready/)).
 
 BlueShift-Logo-Entwurf: `docs/assets/blueshift-logo.png` (Vollfarbe; OLED-Mono
 später separat) — kein automatisches Markenrecht für kommerzielle Produkte.

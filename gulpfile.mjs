@@ -73,7 +73,7 @@ function _Tag(_task, _meta) {
 
 const TASK_HELP = [
   ["help", "Show this task list (default — safe)"],
-  ["docs", "Compose README.md from de-DE.src.md + compatibility table"],
+  ["docs", "Compose README.md + README.de-DE.md from locale sources + compatibility table"],
   ["format", "Run clang-format -i on project C/C++ sources"],
   ["format:check", "Check clang-format without writing"],
   ["check", "format:check + optional pio check (if PlatformIO available)"],
@@ -108,20 +108,23 @@ _Tag(help, {
 
 export async function docs() {
   ReportProgress(0, "docs");
-  Log('Composing README.md from <path/><context="task log"/>', {
+  Log('Composing READMEs from locale sources (default <path/>)<context="task log"/>', {
     path: README_SOURCE_RELATIVE,
   });
   const result = ComposeReadme({ root: rootDir });
-  if (result.changed) {
-    Log('Wrote <path/> (<bytes format="int"/> bytes)<context="task log"/>', {
-      path: "README.md",
-      bytes: result.bytes,
-    });
-  } else {
-    Log(
-      'README.md already up to date (<bytes format="int"/> bytes).<context="task log"/>',
-      { bytes: result.bytes }
-    );
+  for (const localeResult of result.results ?? []) {
+    const rel = localeResult.output.replace(/\\/g, "/").split("/").slice(-1)[0];
+    if (localeResult.changed) {
+      Log('Wrote <path/> (<bytes format="int"/> bytes)<context="task log"/>', {
+        path: rel,
+        bytes: localeResult.bytes,
+      });
+    } else {
+      Log(
+        '<path/> already up to date (<bytes format="int"/> bytes).<context="task log"/>',
+        { path: rel, bytes: localeResult.bytes }
+      );
+    }
   }
   ReportProgress(1, "docs");
   PlaySignal("success");
@@ -130,7 +133,7 @@ _Tag(docs, {
   gulpName: "docs",
   µDisplayName: 'Compose README<context="µDisplayName"/>',
   µDescription:
-    'Generates README.md from dev/docs/readme/de-DE.src.md and injects the compatibility table from devices.json.<context="µDescription"/>',
+    'Generates README.md and README.de-DE.md from en-US/de-DE sources and injects the compatibility table from devices.json.<context="µDescription"/>',
   µGroup: 'Docs & Quality<context="µGroup"/>',
   µIcon: "\uE915",
   µOrder: 10,
