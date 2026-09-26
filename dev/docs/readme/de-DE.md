@@ -24,7 +24,7 @@
 
 Paket-/Repo-Identifier (ASCII): `blueshift` — öffentlicher Wortlaut **BlueShift™** (Wortmarke; nicht in technischen Identifiern). Details: [`docs/licensing/branding-policy.md`](docs/licensing/branding-policy.md).
 
-**Status:** Milestone 3 — maximale Vorab-Implementierung (`0.3.0-dev`). Board-Layer, SSD1306-Backend, OLED-UI, Nav/ADC, NVS, Factory-Reset, Classic/BLE-Spikes, Bridge-Simulation und Host-Tests sind **IMPLEMENTED_UNVERIFIED**. Physische Hardware ist **noch nicht** verfügbar — daher **nichts physisch VERIFIED**.
+**Status:** Milestone 3 — maximale Vorab-Implementierung (`0.3.0-dev`). Board-Layer, SSD1306-Backend, OLED-UI, Nav/ADC, NVS, Factory-Reset, Classic/BLE-Spikes, Bridge-Simulation und Host-Tests sind **IMPLEMENTED_UNVERIFIED**. Native ESP-IDF Dual-Mode-Bluetooth-Backend: **Compile/Link verifiziert**, physische Verifikation ausstehend. Physische Hardware ist **noch nicht** verfügbar — daher **nichts physisch VERIFIED**.
 
 ---
 

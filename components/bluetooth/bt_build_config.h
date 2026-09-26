@@ -9,7 +9,8 @@
 #define BLUESHIFT_HAVE_CLASSIC_HID_HOST_API 0
 #endif
 
-#if defined(ARDUINO) && defined(ESP32)
+// BLE HID Device APIs exist on Arduino-ESP32 prebuilds and native ESP-IDF.
+#if (defined(ARDUINO) && defined(ESP32)) || defined(ESP_PLATFORM)
 #define BLUESHIFT_HAVE_BLE_HID_DEVICE_API 1
 #else
 #define BLUESHIFT_HAVE_BLE_HID_DEVICE_API 0

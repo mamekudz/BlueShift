@@ -49,7 +49,8 @@ LILYGO T-Lion — ESP32-WROVER with PSRAM (DOCUMENTED / IMPLEMENTED_UNVERIFIED b
 | skeleton (M4 adapters, BT gated off) | 291873 / 1310720 (22.3%) | 23184 / 327680 (7.1%) | no Bluedroid link | 2026-09-25 |
 | t-lion-debug (pre-M4 / OLED only) | 341273 / 1310720 (26.0%) | 23960 / 327680 (7.3%) | ThingPulse | 2026-09-25 |
 | t-lion-debug (M4 + BTDM platform) | 1137381 / 1310720 (86.8%) | 41444 / 327680 (12.6%) | Bluedroid linked | 2026-09-25 LINKER |
+| **t-lion-idf-spike (dual Classic+BLE)** | **914852 / 1048576 (87.2%)** | **44476 / 327680 (13.6%)** | ESP-IDF 5.3.1 Bluedroid BTDM + HID Host + esp_hid; SINGLE_APP_LARGE | 2026-09-26 LINKER |
 
 **BUILD-TIME / LINKER DATA only** — not physical runtime.  
-Delta for enabling Bluedroid BTDM path on T-Lion ≈ **+780 KiB flash**, **+17 KiB DRAM** vs OLED-only T-Lion build.
+Arduino T-Lion uses a ~1.25 MiB app window; IDF spike uses SINGLE_APP_LARGE (~1 MiB). Figures are not 1:1 comparable but both show Bluedroid dual-mode is flash-heavy.
 

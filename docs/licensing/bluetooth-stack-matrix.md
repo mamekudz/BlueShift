@@ -63,6 +63,24 @@ Platform: `espressif32 @ 6.9.0` / Arduino-ESP32 2.x prebuilt SDK for ESP32:
 
 This is an **Arduino packaging / sdkconfig** limitation, not proof that ESP-IDF cannot do the roles.
 
+### Native ESP-IDF spike result (2026-09-26)
+
+Platform: `espressif32 @ 6.9.0` + `framework-espidf @ 3.50301.0` (**ESP-IDF 5.3.1**), env `t-lion-idf-spike`.
+
+| Item | Result |
+| --- | --- |
+| Classic HID Host | **LINKED** (`esp_bt_hid_host_init` / `register_callback` / `connect` / `disconnect`) |
+| BLE HID Device | **LINKED** (`esp_hidd_dev_init` / `esp_ble_hidd_dev_init`) |
+| Simultaneous in one binary | **YES** (COMPILE + LINK VERIFIED) |
+| Host stack | Bluedroid BTDM only (NimBLE not used) |
+| BTstack | **NOT REQUIRED** |
+| Commercial class | **GREEN** (Espressif Apache-2.0 graph) |
+| Physical | UNVERIFIED |
+
+Authoritative write-up: [`docs/bluetooth/esp-idf-dual-mode-spike.md`](../bluetooth/esp-idf-dual-mode-spike.md).
+
+**Recommendation:** migrate production firmware to native ESP-IDF (separate milestone). Keep Arduino envs as baseline until then.
+
 ---
 
 ## Bluepad32 without BTstack?
@@ -89,7 +107,5 @@ ESP32 controller BTDM
          project BridgeCore / parsers
 ```
 
-- **BTstack required?** **No**  
-- **Commercial-dependency class:** **GREEN** (Espressif) for the target graph; **YELLOW** until Classic HID Host is enabled in the actual build product used for T-Lion  
-
-See `docs/bluetooth/esp-idf-dual-mode.md`.
+- **BTstack required?** **No** (native ESP-IDF 5.3.1 dual-mode LINK VERIFIED — see `esp-idf-dual-mode-spike.md`)  
+- **Commercial-dependency class:** **GREEN** (Espressif Apache-2.0) for the native IDF graph; Arduino pin remains **PARTIAL** (Classic HID Host not in prebuilt `libbt.a`)

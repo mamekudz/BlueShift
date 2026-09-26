@@ -21,6 +21,7 @@ Baseline implementation commit for this update: `b9d3506`.
 | PlatformIO platform `espressif32` | **6.9.0** | Apache-2.0 (platform) + package notices | PlatformIO registry | Build platform | None |
 | Arduino-ESP32 framework (via platform) | as shipped by platform 6.9.0 | Espressif **Apache-2.0** family; see package NOTICE | https://github.com/espressif/arduino-esp32 | Firmware framework (`Wire`, `Preferences`, HAL, …) | None |
 | ESP-IDF components (via Arduino) | as pulled by framework | Primarily **Apache-2.0** + nested 3rd-party notices | Espressif | Linked when used by framework features | None |
+| ESP-IDF native spike (`framework-espidf @ 3.50301.0` / **5.3.1**) | `bt` Bluedroid + `esp_hid` | **Apache-2.0** | Espressif | Linked in `t-lion-idf-spike*` | Spike only — production migration pending |
 
 When distributing firmware binaries, retain applicable MIT/Apache notices
 (at least ThingPulse MIT copyright and Espressif notices from the build tree).

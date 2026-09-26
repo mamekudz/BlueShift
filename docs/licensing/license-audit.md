@@ -136,7 +136,9 @@ Upstream explicitly warns that Bluepad32 depends on BlueKitchen BTstack, free fo
 | Adapters | `BluetoothPlatform`, `EspIdfClassicHidHost`, `EspIdfBleHidPeripheral` |
 | Commercial-dependency class | **GREEN** |
 | Current Arduino pin | Classic HID Host **API missing** in prebuilt SDK — Partial |
-| Docs | `docs/licensing/bluetooth-stack-matrix.md`, `docs/bluetooth/esp-idf-dual-mode.md` |
+| Docs | `docs/licensing/bluetooth-stack-matrix.md`, `docs/bluetooth/esp-idf-dual-mode.md`, `docs/bluetooth/esp-idf-dual-mode-spike.md` |
+| Native spike (2026-09-26) | ESP-IDF **5.3.1** dual-mode Classic HID Host + BLE HID Device: **LINK VERIFIED** |
+| BTstack | **NOT REQUIRED** for production |
 
 ---
 
