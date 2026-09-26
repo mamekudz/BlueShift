@@ -37,4 +37,8 @@ static const char *const kLocaleEnUs[] = {
     "INPUT LOST",
     "OUTPUT LOST",
     "Self-test",
+    "AUD",
+    "Audio",
+    "Off",
+    "ESP][ Spk->A2DP",
 };

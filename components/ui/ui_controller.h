@@ -15,7 +15,8 @@ enum class UiScreen : uint8_t {
     Diagnostics,
     Settings,
     About,
-    ConfirmFactoryReset
+    ConfirmFactoryReset,
+    Audio // optional experimental — ESP][ speaker → A2DP
 };
 
 struct UiStatusModel {

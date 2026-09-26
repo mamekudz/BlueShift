@@ -44,7 +44,11 @@ enum class BlueshiftMsgId : uint16_t {
     StatusInputLost = 33,
     StatusOutputLost = 34,
     SelfTest = 35,
-    MsgCount = 36
+    LabelAud = 36,
+    ScreenAudio = 37,
+    AudioOff = 38,
+    AudioEsp2Speaker = 39,
+    MsgCount = 40
 };
 
 void i18nSetLocale(BlueshiftLocale locale);

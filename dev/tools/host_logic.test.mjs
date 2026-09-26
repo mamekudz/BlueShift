@@ -297,9 +297,30 @@ test("M4 ESP-IDF BT adapters present", () => {
   assert.match(matrix, /BTstack required\?\*\* \*\*No/i);
 });
 
-test("version is 0.4.0-dev", () => {
+test("version is 0.5.0-dev", () => {
   const ver = readFileSync(join(ROOT, "include/blueshift/version.h"), "utf8");
-  assert.match(ver, /0\.4\.0-dev/);
+  assert.match(ver, /0\.5\.0-dev/);
+});
+
+test("audio protocol and spikes present", () => {
+  const need = [
+    "components/protocol/extension_protocol.h",
+    "components/protocol/extension_codec.cpp",
+    "components/audio/edge_to_pcm.cpp",
+    "components/audio/edge_jitter_buffer.h",
+    "components/bridge/connection_triplet.h",
+    "src/idf_spike/a2dp_source_spike.c",
+    "src/idf_spike/triple_role_spike.c",
+    "docs/audio/architecture.md",
+    "docs/protocol/esp2-extension.md",
+    "docs/audio/licensing-a2dp.md",
+  ];
+  for (const rel of need) {
+    assert.ok(existsSync(join(ROOT, rel)), rel);
+  }
+  const ini = readFileSync(join(ROOT, "platformio.ini"), "utf8");
+  assert.match(ini, /\[env:t-lion-idf-spike-a2dp\]/);
+  assert.match(ini, /\[env:t-lion-idf-spike-triple\]/);
 });
 
 test("IDF production envs and partitions present", () => {

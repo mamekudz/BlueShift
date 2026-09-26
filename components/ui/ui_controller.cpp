@@ -4,7 +4,7 @@ namespace blueshift {
 
 namespace {
 
-constexpr int kMenuCount = 7;
+constexpr int kMenuCount = 8;
 
 UiScreen menuScreenAt(int index) {
     switch (index) {
@@ -22,6 +22,8 @@ UiScreen menuScreenAt(int index) {
         return UiScreen::Diagnostics;
     case 6:
         return UiScreen::Settings;
+    case 7:
+        return UiScreen::Audio;
     default:
         return UiScreen::Status;
     }

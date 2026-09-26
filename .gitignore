@@ -59,6 +59,8 @@ sdkconfig.defaults
 sdkconfig.t-lion-idf-spike
 sdkconfig.t-lion-idf-spike-classic
 sdkconfig.t-lion-idf-spike-ble
+sdkconfig.t-lion-idf-spike-a2dp
+sdkconfig.t-lion-idf-spike-triple
 sdkconfig.t-lion-idf-debug
 sdkconfig.t-lion-idf-release
 

@@ -24,7 +24,7 @@
 
 Paket-/Repo-Identifier (ASCII): `blueshift` — öffentlicher Wortlaut **BlueShift™** (Wortmarke; nicht in technischen Identifiern). Details: [`docs/licensing/branding-policy.md`](docs/licensing/branding-policy.md).
 
-**Status:** Milestone 4 — native ESP-IDF Produktionsmigration (`0.4.0-dev`). Arduino-Envs bleiben LEGACY-Baseline. Produktionskandidaten `t-lion-idf-debug` / `t-lion-idf-release` sind **LINK VERIFIED** (ESP-IDF 5.3.1 Bluedroid BTDM). OLED/Nav/ADC/NVS/Bridge/UI bleiben **IMPLEMENTED_UNVERIFIED**. Physisches T-Lion **noch nicht** verfügbar — **nichts PHYSICALLY VERIFIED**.
+**Status:** Milestone 5 — Audio-Erweiterungs-Feasibility (`0.5.0-dev`). HID-V1-Pfad unveraendert. Experimentelle ESP][-Speaker-zu-A2DP-Architektur in Entwicklung (Protokoll + Edge→PCM host-getestet; A2DP/Triple-Role-Spikes). Physisches T-Lion **noch nicht** verfuegbar — **nichts PHYSICALLY VERIFIED**.
 
 ---
 
@@ -154,7 +154,7 @@ Generated from [`docs/compatibility/devices.json`](docs/compatibility/devices.js
 ```text
 platformio.ini   — skeleton / t-lion-debug / t-lion-release / native
 src/main.cpp     — Boot-Skeleton + dokumentierte Pin-Logs
-include/blueshift/version.h  — 0.4.0-dev
+include/blueshift/version.h  — 0.5.0-dev
 ```
 
 Gepinnt: `espressif32 @ 6.9.0`. Bluetooth-Stacks noch **nicht** als `lib_deps`.
@@ -228,7 +228,7 @@ Dieses Repository nutzt den **µGulp**-Automatisierungsworkflow für:
 | Classic BT / BLE Stack in Firmware | PLANNED (Recherche abgeschlossen) |
 | Physische Verifikation | ausstehend |
 
-Version: **0.4.0-dev**. Nächster physischer Schritt: **T-LION HARDWARE BRING-UP** (`t-lion-idf-debug`).
+Version: **0.5.0-dev**. Nächster physischer Schritt: **T-LION HARDWARE BRING-UP** (`t-lion-idf-debug`).
 
 ---
 
@@ -245,6 +245,13 @@ ESP][ ist der erste vorgesehene Abnehmer (ESP32-S3 Apple-II-Emulator-Projekt). B
 3. Classic HID Input (ein Gerät, ein Profil)
 4. BLE HID Output + minimale Bridge
 5. Reconnect, Profile, Kompatibilitätsausbau
+
+### Experimentell / Roadmap (Audio)
+
+**Experimentelle ESP][-Speaker-zu-A2DP-Architektur in Entwicklung.**
+
+Kein fertiger „Bluetooth-Audio-Bridge“-Anspruch. Siehe [`docs/audio/architecture.md`](docs/audio/architecture.md).
+HID-Bridging bleibt die primäre V1-Fähigkeit.
 
 ---
 

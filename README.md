@@ -24,7 +24,7 @@
 
 Package / repo identifier (ASCII): `blueshift` — public wording **BlueShift™** (word mark; not in technical identifiers). Details: [`docs/licensing/branding-policy.md`](docs/licensing/branding-policy.md).
 
-**Status:** Milestone 4 — native ESP-IDF production migration (`0.4.0-dev`). Arduino envs remain LEGACY baseline. Production candidates `t-lion-idf-debug` / `t-lion-idf-release` are **LINK VERIFIED** (ESP-IDF 5.3.1 Bluedroid BTDM). OLED/nav/ADC/NVS/bridge/UI remain **IMPLEMENTED_UNVERIFIED**. Physical T-Lion **not yet** available — **nothing PHYSICALLY VERIFIED**.
+**Status:** Milestone 5 — audio expansion feasibility (`0.5.0-dev`). HID V1 path unchanged. Experimental ESP][ speaker-to-A2DP architecture under development (protocol + edge→PCM host-tested; A2DP/triple-role spikes). Physical T-Lion **not yet** available — **nothing PHYSICALLY VERIFIED**.
 
 ---
 
@@ -154,7 +154,7 @@ Generated from [`docs/compatibility/devices.json`](docs/compatibility/devices.js
 ```text
 platformio.ini   — skeleton / t-lion-debug / t-lion-release / native
 src/main.cpp     — boot skeleton + documented pin logs
-include/blueshift/version.h  — 0.4.0-dev
+include/blueshift/version.h  — 0.5.0-dev
 ```
 
 Pinned: `espressif32 @ 6.9.0`. Bluetooth stacks are **not** yet `lib_deps`.
@@ -228,7 +228,7 @@ This repository uses the **µGulp** automation workflow for:
 | Classic BT / BLE stack in firmware | PLANNED (research done) |
 | Physical verification | pending |
 
-Version: **0.4.0-dev**. Next physical step: **T-LION HARDWARE BRING-UP** (`t-lion-idf-debug`).
+Version: **0.5.0-dev**. Next physical step: **T-LION HARDWARE BRING-UP** (`t-lion-idf-debug`).
 
 ---
 
@@ -245,6 +245,13 @@ ESP][ is the first intended consumer (ESP32-S3 Apple II emulator project). BlueS
 3. Classic HID input (one device, one profile)
 4. BLE HID output + minimal bridge
 5. Reconnect, profiles, compatibility growth
+
+### Experimental / Roadmap (audio)
+
+**Experimental ESP][ speaker-to-A2DP architecture under development.**
+
+Not a finished “Bluetooth audio bridge”. See [`docs/audio/architecture.md`](docs/audio/architecture.md).
+HID bridging remains the primary V1 capability.
 
 ---
 

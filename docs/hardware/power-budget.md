@@ -17,9 +17,12 @@
 | ESP32 active, radios off, OLED on | 40–80 mA | ESTIMATED |
 | + Classic BT connected | +30–80 mA | ESTIMATED |
 | + BLE connected | +10–40 mA | ESTIMATED |
+| + A2DP Source streaming | +40–100 mA (CPU+RF) | ESTIMATED — higher than HID-only |
 | OLED off / dim | −5–15 mA vs full | ESTIMATED |
 | Deep sleep | low mA / µA | ESTIMATED; policy not enabled yet |
 | Pairing (both scanning/adv) | high end of above | ESTIMATED |
+
+A2DP increases radio + SBC CPU cost. **Do not claim battery runtime** until physical T-Lion measurement.
 
 ## Runtime estimator (formula only)
 

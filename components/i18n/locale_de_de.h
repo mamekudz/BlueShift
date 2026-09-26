@@ -37,4 +37,8 @@ static const char *const kLocaleDeDe[] = {
     "EINGABE WEG",
     "AUSGABE WEG",
     "Selbsttest",
+    "AUD",
+    "Audio",
+    "Aus",
+    "ESP][ Spk->A2DP",
 };

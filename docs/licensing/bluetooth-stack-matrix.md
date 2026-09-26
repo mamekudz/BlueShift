@@ -79,6 +79,18 @@ Platform: `espressif32 @ 6.9.0` + `framework-espidf @ 3.50301.0` (**ESP-IDF 5.3.
 
 Authoritative write-up: [`docs/bluetooth/esp-idf-dual-mode-spike.md`](../bluetooth/esp-idf-dual-mode-spike.md).
 
+### A2DP Source + triple-role (2026-09-26 research)
+
+| Item | Result |
+| --- | --- |
+| A2DP Source API | `esp_a2d_source_*` in ESP-IDF 5.3.1 Bluedroid |
+| SBC codec in-tree | Apache-2.0 (encoder Broadcom / decoder AOSP+OI) |
+| BTstack for audio | **NOT REQUIRED** |
+| Commercial class | **GREEN** (same Espressif graph; patent counsel separate if shipping audio) |
+| Triple-role spike | see `docs/audio/a2dp-triple-role-spike.md` |
+
+---
+
 **Recommendation:** migrate production firmware to native ESP-IDF (separate milestone). Keep Arduino envs as baseline until then.
 
 ---

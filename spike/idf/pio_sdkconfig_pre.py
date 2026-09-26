@@ -13,6 +13,8 @@ spike_map = {
     "t-lion-idf-spike": root / "spike" / "idf" / "sdkconfig.defaults.dual",
     "t-lion-idf-spike-classic": root / "spike" / "idf" / "sdkconfig.defaults.classic",
     "t-lion-idf-spike-ble": root / "spike" / "idf" / "sdkconfig.defaults.ble",
+    "t-lion-idf-spike-a2dp": root / "spike" / "idf" / "sdkconfig.defaults.a2dp",
+    "t-lion-idf-spike-triple": root / "spike" / "idf" / "sdkconfig.defaults.triple",
 }
 
 prod_map = {

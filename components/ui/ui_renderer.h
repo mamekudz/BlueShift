@@ -20,9 +20,11 @@ struct UiRenderModel {
     int selection = 0;
     LinkIndicator inputLink = LinkIndicator::Disconnected;
     LinkIndicator outputLink = LinkIndicator::Disconnected;
+    LinkIndicator audioLink = LinkIndicator::Disconnected;
     const char *diagLabel = "";
     bool diagOk = false;
     bool selfTestPending = true;
+    bool audioUiEnabled = false; // experimental menu; default off
 };
 
 // Renders compact 128x64 layouts. All user strings via i18x.

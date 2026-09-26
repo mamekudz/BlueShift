@@ -36,20 +36,24 @@ void UiRenderer::renderStatus(Display &d, const UiRenderModel &m) const {
     std::snprintf(line, sizeof(line), "%s %s %s", i18nMsg(BlueshiftMsgId::LabelIn),
                   linkGlyph(m.inputLink),
                   m.status.inputName != nullptr && m.status.inputName[0] ? m.status.inputName : "-");
-    d.drawText(0, 14, line);
+    d.drawText(0, 12, line);
     std::snprintf(line, sizeof(line), "%s %s %s", i18nMsg(BlueshiftMsgId::LabelOut),
                   linkGlyph(m.outputLink),
                   m.status.outputName != nullptr && m.status.outputName[0] ? m.status.outputName
                                                                            : "-");
-    d.drawText(0, 26, line);
+    d.drawText(0, 24, line);
+    std::snprintf(line, sizeof(line), "%s %s", i18nMsg(BlueshiftMsgId::LabelAud),
+                  linkGlyph(m.audioLink));
+    d.drawText(0, 36, line);
     if (m.status.battery.valid && m.status.battery.percent != 0xFF) {
-        std::snprintf(line, sizeof(line), "%s %u%%", i18nMsg(BlueshiftMsgId::LabelBat),
-                      static_cast<unsigned>(m.status.battery.percent));
+        std::snprintf(line, sizeof(line), "%s %u%% %s", i18nMsg(BlueshiftMsgId::LabelBat),
+                      static_cast<unsigned>(m.status.battery.percent),
+                      bridgeStateName(m.status.bridge));
     } else {
-        std::snprintf(line, sizeof(line), "%s --", i18nMsg(BlueshiftMsgId::LabelBat));
+        std::snprintf(line, sizeof(line), "%s -- %s", i18nMsg(BlueshiftMsgId::LabelBat),
+                      bridgeStateName(m.status.bridge));
     }
-    d.drawText(0, 40, line);
-    d.drawText(0, 54, bridgeStateName(m.status.bridge));
+    d.drawText(0, 48, line);
 }
 
 void UiRenderer::renderPair(Display &d, BlueshiftMsgId title, LinkIndicator link) const {
@@ -153,6 +157,12 @@ void UiRenderer::render(Display &display, const UiRenderModel &model) const {
     case UiScreen::ConfirmFactoryReset:
         renderConfirmReset(display);
         break;
+    case UiScreen::Audio: {
+        static const BlueshiftMsgId items[] = {BlueshiftMsgId::AudioOff,
+                                              BlueshiftMsgId::AudioEsp2Speaker};
+        renderListScreen(display, BlueshiftMsgId::ScreenAudio, model.selection, items, 2);
+        break;
+    }
     }
     display.present();
 }

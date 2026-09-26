@@ -20,10 +20,11 @@
 #include "storage/factory_reset.h"
 #include "ui/ui_controller.h"
 #include "ui/ui_renderer.h"
-#include "bluetooth/bluetooth_error.h"
-#include "bluetooth/reconnect_policy.h"
-#include "diagnostics/hw_revision.h"
-#include "diagnostics/self_test.h"
+#include "audio/edge_jitter_buffer.h"
+#include "audio/edge_to_pcm.h"
+#include "bridge/connection_triplet.h"
+#include "protocol/extension_codec.h"
+#include "protocol/extension_protocol.h"
 
 static int g_failures = 0;
 
@@ -345,6 +346,94 @@ static void testI18n() {
     CHECK(std::strcmp(i18nMsg(BlueshiftMsgId::LabelBat), "AKKU") == 0);
     i18nSetLocale(BlueshiftLocale::EnUs);
     CHECK(std::strcmp(i18nMsg(BlueshiftMsgId::StatusInputLost), "INPUT LOST") == 0);
+    CHECK(std::strcmp(i18nMsg(BlueshiftMsgId::LabelAud), "AUD") == 0);
+}
+
+static void testExtensionProtocol() {
+    using namespace blueshift::protocol;
+    uint8_t buf[256];
+    uint16_t deltas[4] = {10, 20, 30, 40};
+    const std::size_t n =
+        ExtensionCodec::encodeEdgeBatch(buf, sizeof(buf), 7, 1000, deltas, 4);
+    CHECK(n == kEdgeBatchHeaderBytes + 8);
+    EdgeBatchHeader hdr{};
+    uint16_t outD[8] = {};
+    CHECK(ExtensionCodec::decodeEdgeBatch(buf, n, hdr, outD, 8));
+    CHECK(hdr.sequence == 7);
+    CHECK(hdr.baseCycle == 1000);
+    CHECK(hdr.edgeCount == 4);
+    CHECK(outD[2] == 30);
+
+    CapsPayload caps{};
+    const std::size_t cn = ExtensionCodec::encodeCaps(buf, sizeof(buf), caps);
+    CHECK(cn == 10);
+    CapsPayload caps2{};
+    CHECK(ExtensionCodec::decodeCaps(buf, cn, caps2));
+    CHECK(hasCapability(caps2.capabilities, Capability::SpeakerEdgeStream));
+
+    CHECK(ExtensionCodec::encodeControl(buf, sizeof(buf), StreamCommand::StartAudio) == 3);
+    ControlPayload ctrl{};
+    CHECK(ExtensionCodec::decodeControl(buf, 3, ctrl));
+    CHECK(ctrl.command == StreamCommand::StartAudio);
+}
+
+static void testEdgeToPcmSubSamplePulse() {
+    blueshift::audio::EdgeToPcmRenderer r(44100);
+    r.reset(0, false);
+    // One sample ≈ ~23 cycles. Pulse high for 5 cycles starting at cycle 5.
+    r.pushEdge(5);  // low→high
+    r.pushEdge(10); // high→low
+    int16_t sample = 0;
+    CHECK(r.render(&sample, 1) == 1);
+    // Must be non-zero: sub-sample pulse contributes (regression requirement).
+    CHECK(sample != 0);
+    // Not full amplitude either (only ~5/23 of interval high).
+    CHECK(sample > -blueshift::audio::kPcmAmplitude);
+    CHECK(sample < blueshift::audio::kPcmAmplitude);
+}
+
+static void testEdgeToPcmSquareAndDrift() {
+    blueshift::audio::EdgeToPcmRenderer r(48000);
+    r.reset(0, false);
+    // ~1 kHz square: period ≈ 1020 cycles → edge every 510 cycles.
+    uint32_t cycle = 0;
+    for (int i = 0; i < 200; ++i) {
+        cycle += 510;
+        r.pushEdge(cycle);
+    }
+    int16_t buf[256];
+    const std::size_t n = r.render(buf, 256);
+    CHECK(n == 256);
+    CHECK(r.samplesRendered() == 256);
+    // Long stream: render more without integer blow-up.
+    for (int k = 0; k < 40; ++k) {
+        for (int i = 0; i < 50; ++i) {
+            cycle += 510;
+            r.pushEdge(cycle);
+        }
+        CHECK(r.render(buf, 256) == 256);
+    }
+    CHECK(r.samplesRendered() == 256u + 40u * 256u);
+}
+
+static void testJitterBufferAndTriplet() {
+    blueshift::audio::EdgeJitterBuffer jb;
+    uint16_t d[3] = {1, 2, 3};
+    CHECK(jb.pushBatch(0, 100, d, 3));
+    CHECK(jb.size() == 3);
+    blueshift::audio::TimedEdge e{};
+    CHECK(jb.pop(e));
+    CHECK(e.absCycle == 101);
+
+    blueshift::ConnectionTriplet t;
+    t.inputConnected = true;
+    t.hostConnected = true;
+    CHECK(blueshift::hidBridgeViable(t));
+    CHECK(!blueshift::audioPathViable(t));
+    t.audioConnected = true;
+    CHECK(blueshift::audioPathViable(t));
+    t.audioConnected = false;
+    CHECK(blueshift::hidBridgeViable(t)); // audio fail must not break HID viability
 }
 
 int main() {
@@ -364,6 +453,10 @@ int main() {
     testBluetoothErrorNames();
     testSelfTestAndHwCompare();
     testI18n();
+    testExtensionProtocol();
+    testEdgeToPcmSubSamplePulse();
+    testEdgeToPcmSquareAndDrift();
+    testJitterBufferAndTriplet();
     if (g_failures != 0) {
         std::printf("%d failure(s)\n", g_failures);
         return 1;

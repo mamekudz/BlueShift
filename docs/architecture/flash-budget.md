@@ -63,6 +63,8 @@ Avoid RAM, power, attack surface, and complexity. Keep Wi-Fi optional if OTA is 
 | Env | App flash | DRAM | Notes | Label |
 | --- | --- | --- | --- | --- |
 | t-lion-idf-spike (dual) | 914852 / 1048576 (87.2%) | 44476 / 327680 (13.6%) | ~1 MiB slot | BUILD MEASURED 2026-09-26 |
+| t-lion-idf-spike-a2dp | 720804 / 1048576 (68.7%) | 50848 / 327680 (15.5%) | A2DP Source only | BUILD MEASURED 2026-09-26 |
+| **t-lion-idf-spike-triple** | **1038524 / 1048576 (99.0%)** | **60724 / 327680 (18.5%)** | HID+HID+A2DP | BUILD MEASURED 2026-09-26 |
 | **t-lion-idf-debug** | **1026875 / 2228224 (46.1%)** | **48048 / 327680 (14.7%)** | debug partition ~2.1 MiB | BUILD MEASURED 2026-09-26 |
 | **t-lion-idf-release** | **852596 / 1966080 (43.4%)** | **46392 / 327680 (14.2%)** | no-OTA ~1.9 MiB | BUILD MEASURED 2026-09-26 |
 | t-lion-debug (Arduino) | ~1137 KiB / ~1.25 MiB | ~41 KiB | LEGACY baseline | BUILD MEASURED |

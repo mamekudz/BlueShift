@@ -31,7 +31,8 @@ Core Bluetooth bridging must **not** depend on PSRAM unless evidence proves othe
 | skeleton (M4 adapters, BT gated off) | 291873 / 1310720 (22.3%) | 23184 / 327680 (7.1%) | Arduino LEGACY | 2026-09-25 |
 | t-lion-debug (M4 + BTDM platform) | 1137381 / 1310720 (86.8%) | 41444 / 327680 (12.6%) | Arduino LEGACY | 2026-09-25 |
 | t-lion-idf-spike (dual) | 914852 / 1048576 (87.2%) | 44476 / 327680 (13.6%) | 1 MiB spike slot | 2026-09-26 |
-| **t-lion-idf-debug** | **1026875 / 2228224 (46.1%)** | **48048 / 327680 (14.7%)** | production candidate | 2026-09-26 |
+| **t-lion-idf-spike-triple** | **1038524 / 1048576 (99.0%)** | **60724 / 327680 (18.5%)** | HID Host+BLE HID+A2DP | 2026-09-26 |
+| t-lion-idf-spike-a2dp | 720804 / 1048576 (68.7%) | 50848 / 327680 (15.5%) | A2DP Source only | 2026-09-26 |
 | **t-lion-idf-release** | **852596 / 1966080 (43.4%)** | **46392 / 327680 (14.2%)** | production candidate | 2026-09-26 |
 
 ## Runtime (pending physical)
