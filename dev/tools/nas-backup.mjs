@@ -34,6 +34,7 @@ export const NAS_BACKUP_INCLUDE_FILES = Object.freeze([
   "README.md",
   "README.de-DE.md",
   "THIRD_PARTY_LICENSES.md",
+  "LICENSE.md",
   "platformio.ini",
   "package.json",
   "package-lock.json",
@@ -41,7 +42,6 @@ export const NAS_BACKUP_INCLUDE_FILES = Object.freeze([
   ".gitignore",
   ".editorconfig",
   ".clang-format",
-  "LICENSE",
 ]);
 
 export const NAS_BACKUP_EXCLUDE_DIRS = Object.freeze([

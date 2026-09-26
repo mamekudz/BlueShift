@@ -257,11 +257,15 @@ HID bridging remains the primary V1 capability.
 
 ## Licensing
 
-The final BlueShift project license is being prepared.
+Original BlueShift materials are licensed under the **BlueShift Community License 1.0**
+([`LICENSE.md`](LICENSE.md)) — provisional custom license text.
 
-The project is intended to remain freely available for personal use, hobby, education, research and other non-commercial purposes.
+Non-commercial personal, hobby, educational and research use is permitted under that
+license. **Commercial Use requires a separate written license** from the author.
 
-Interested in manufacturing, distribution, integration or sale of BlueShift or BlueShift-based hardware? Please contact the project author about commercial licensing or OEM arrangements:
+Interested in manufacturing, distribution, integration or sale of BlueShift or
+BlueShift-based hardware? Please contact the project author about commercial
+licensing or OEM arrangements:
 
 - Repository: https://github.com/mamekudz/BlueShift
 - Issues: https://github.com/mamekudz/BlueShift/issues
@@ -275,8 +279,7 @@ Bluepad32 / BTstack / ESP32KeyBridge / EspBle are **referenced, not vendored**. 
 
 Trademark / logo rights are separate from the software license; see
 [`docs/licensing/branding-policy.md`](docs/licensing/branding-policy.md) and
-[`docs/licensing/license-policy-draft.md`](docs/licensing/license-policy-draft.md)
-(**policy draft, not legal text**).
+[`LICENSE.md`](LICENSE.md) §7.
 
 Word mark: **BlueShift™** (not ®). Graphic logo: draft — trademark treatment **UNDECIDED**.
 

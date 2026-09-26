@@ -12,6 +12,7 @@ export const GIT_BACKUP_ENSURE_PATHS = Object.freeze([
   "README.md",
   "README.de-DE.md",
   "THIRD_PARTY_LICENSES.md",
+  "LICENSE.md",
   "platformio.ini",
   "package.json",
   "gulpfile.mjs",

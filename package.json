@@ -1,6 +1,7 @@
 {
   "name": "blueshift",
   "version": "0.5.0-dev",
+  "license": "SEE LICENSE.md",
   "private": true,
   "description": "BlueShift — Bringing Classic Bluetooth into the BLE era (µGulp / Gulp task runner)",
   "type": "module",

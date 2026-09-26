@@ -243,10 +243,12 @@ HID-Bridging bleibt die primäre V1-Fähigkeit.
 
 ## Lizenzierung
 
-Die endgültige Projektlizenz von BlueShift wird derzeit vorbereitet.
+Originale BlueShift-Materialien stehen unter der **BlueShift Community License 1.0**
+([`LICENSE.md`](LICENSE.md)) — vorläufiger Custom-Lizenztext.
 
-Das Projekt soll für persönliche Nutzung, Hobby, Bildung, Forschung und
-andere nicht-kommerzielle Zwecke frei verfügbar bleiben.
+Nicht-kommerzielle persönliche, Hobby-, Bildungs- und Forschungsnutzung ist unter
+dieser Lizenz erlaubt. **Commercial Use erfordert eine separate schriftliche Lizenz**
+des Autors.
 
 Interesse an Herstellung, Vertrieb, Integration oder Verkauf von BlueShift
 oder BlueShift-basierter Hardware? Bitte den Projekt-Autor kontaktieren, um
@@ -267,8 +269,7 @@ BlueKitchen).
 
 Marken-/Logo-Rechte sind von der Softwarelizenz getrennt; siehe
 [`docs/licensing/branding-policy.md`](docs/licensing/branding-policy.md) und
-[`docs/licensing/license-policy-draft.md`](docs/licensing/license-policy-draft.md)
-(**Policy-Entwurf, kein Rechtstext**).
+[`LICENSE.md`](LICENSE.md) §7.
 
 Wortmarke: **BlueShift™** (nicht ®). Grafisches Logo: Entwurf —
 Markenbehandlung **UNDECIDED**.

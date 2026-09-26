@@ -1,10 +1,11 @@
 # BlueShift license policy draft
 
-> **POLICY DRAFT — NOT FINAL LICENSE TEXT**  
-> This is plain-language intent for review. It is **not** a binding license,
-> EULA, or commercial contract. Do not treat this file as legal permission.
+> **SUPERSEDED for project licensing intent**  
+> The provisional binding project text for original BlueShift materials is now
+> [`LICENSE.md`](../../LICENSE.md) (**BlueShift Community License 1.0**).  
+> This draft remains as historical intent notes only.
 
-**Related:** [`license-audit.md`](license-audit.md) · contact via GitHub (below)
+**Related:** [`license-audit.md`](license-audit.md) · [`LICENSE.md`](../../LICENSE.md) · contact via GitHub (below)
 
 ---
 

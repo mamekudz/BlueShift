@@ -11,5 +11,6 @@ discussions (no private email invented here):
 
 Suggested issue title prefix: `commercial-licensing:`
 
-Policy intent (not legal text): [`license-policy-draft.md`](license-policy-draft.md).
+Policy: [`LICENSE.md`](../../LICENSE.md) (BlueShift Community License 1.0).  
+Historical intent notes: [`license-policy-draft.md`](license-policy-draft.md).  
 Audit: [`license-audit.md`](license-audit.md).

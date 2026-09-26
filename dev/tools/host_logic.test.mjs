@@ -340,3 +340,10 @@ test("third party lists ThingPulse", () => {
   assert.match(lic, /ThingPulse|esp8266-oled-ssd1306/);
   assert.match(lic, /4\.6\.2/);
 });
+
+test("BlueShift Community License is present", () => {
+  const lic = readFileSync(join(ROOT, "LICENSE.md"), "utf8");
+  assert.match(lic, /BlueShift Community License 1\.0/);
+  assert.match(lic, /Commercial Use Requires a Separate License/);
+  assert.match(lic, /Meinolf Amekudzi/);
+});
