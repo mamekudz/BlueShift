@@ -15,7 +15,8 @@ inline constexpr uint8_t kDeviceNameMax = 24;
 
 enum class KnownDeviceKind : uint8_t {
     ClassicInput = 0,
-    BleHost = 1
+    BleHost = 1,
+    A2dpSink = 2 // headphones/speaker — separate from HID bonds
 };
 
 struct KnownDeviceMeta {

@@ -1,0 +1,8 @@
+{
+  "name": "golden_malformed_truncated",
+  "protocolVersion": 1,
+  "description": "Truncated EdgeBatch header — must reject",
+  "malformed": true,
+  "wireHex": "10 00 01 00",
+  "expect": { "parse": "Malformed" }
+}

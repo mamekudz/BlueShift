@@ -22,8 +22,11 @@
 #include "ui/ui_renderer.h"
 #include "audio/edge_jitter_buffer.h"
 #include "audio/edge_to_pcm.h"
+#include "audio/a2dp_audio_output.h"
+#include "audio/audio_pipeline.h"
 #include "bridge/connection_triplet.h"
 #include "protocol/extension_codec.h"
+#include "protocol/extension_parser.h"
 #include "protocol/extension_protocol.h"
 
 static int g_failures = 0;
@@ -352,17 +355,27 @@ static void testI18n() {
 static void testExtensionProtocol() {
     using namespace blueshift::protocol;
     uint8_t buf[256];
-    uint16_t deltas[4] = {10, 20, 30, 40};
+    uint32_t deltas[4] = {10, 20, 30, 40};
     const std::size_t n =
         ExtensionCodec::encodeEdgeBatch(buf, sizeof(buf), 7, 1000, deltas, 4);
     CHECK(n == kEdgeBatchHeaderBytes + 8);
     EdgeBatchHeader hdr{};
-    uint16_t outD[8] = {};
-    CHECK(ExtensionCodec::decodeEdgeBatch(buf, n, hdr, outD, 8));
+    uint32_t outD[8] = {};
+    uint16_t decoded = 0;
+    CHECK(ExtensionCodec::decodeEdgeBatch(buf, n, hdr, outD, 8, decoded));
+    CHECK(decoded == 4);
     CHECK(hdr.sequence == 7);
     CHECK(hdr.baseCycle == 1000);
     CHECK(hdr.edgeCount == 4);
     CHECK(outD[2] == 30);
+
+    // Escape for large gap
+    uint32_t big[2] = {100, 200000};
+    const std::size_t bn =
+        ExtensionCodec::encodeEdgeBatch(buf, sizeof(buf), 1, 0, big, 2);
+    CHECK(bn == kEdgeBatchHeaderBytes + 2 + 6);
+    CHECK(ExtensionCodec::decodeEdgeBatch(buf, bn, hdr, outD, 8, decoded));
+    CHECK(outD[1] == 200000);
 
     CapsPayload caps{};
     const std::size_t cn = ExtensionCodec::encodeCaps(buf, sizeof(buf), caps);
@@ -371,10 +384,40 @@ static void testExtensionProtocol() {
     CHECK(ExtensionCodec::decodeCaps(buf, cn, caps2));
     CHECK(hasCapability(caps2.capabilities, Capability::SpeakerEdgeStream));
 
-    CHECK(ExtensionCodec::encodeControl(buf, sizeof(buf), StreamCommand::StartAudio) == 3);
+    CHECK(ExtensionCodec::encodeControl(buf, sizeof(buf), StreamCommand::Start) == 3);
     ControlPayload ctrl{};
     CHECK(ExtensionCodec::decodeControl(buf, 3, ctrl));
-    CHECK(ctrl.command == StreamCommand::StartAudio);
+    CHECK(ctrl.command == StreamCommand::Start);
+
+    SyncMarkerPayload sync{};
+    sync.sequence = 3;
+    sync.timelineCycle = 999;
+    sync.speakerLevel = 1;
+    sync.reason = 1;
+    CHECK(ExtensionCodec::encodeSync(buf, sizeof(buf), sync) == 9);
+    SyncMarkerPayload sync2{};
+    CHECK(ExtensionCodec::decodeSync(buf, 9, sync2));
+    CHECK(sync2.timelineCycle == 999);
+    CHECK(sync2.speakerLevel == 1);
+}
+
+static void testExtensionParserMalformed() {
+    using namespace blueshift::protocol;
+    ExtensionParser p;
+    ParsedSpeakerEdge edges[16];
+    uint16_t n = 0;
+    uint8_t trash[] = {0xEE, 0x01, 0x02};
+    CHECK(p.ingest(trash, sizeof(trash), edges, 16, n) == ParseResult::Malformed);
+    CHECK(p.stats().malformed >= 1);
+
+    uint8_t truncated[] = {0x10, 0x00, 0x01, 0x00}; // EdgeBatch too short
+    CHECK(p.ingest(truncated, sizeof(truncated), edges, 16, n) == ParseResult::Malformed);
+
+    uint8_t badVer[10] = {0x01, 0x63, 0x00, 0, 0, 0, 0, 0, 0, 0}; // Caps version 99
+    // capabilities etc.
+    badVer[1] = 99;
+    badVer[2] = 0;
+    CHECK(p.ingest(badVer, 10, edges, 16, n) == ParseResult::UnsupportedVersion);
 }
 
 static void testEdgeToPcmSubSamplePulse() {
@@ -416,9 +459,28 @@ static void testEdgeToPcmSquareAndDrift() {
     CHECK(r.samplesRendered() == 256u + 40u * 256u);
 }
 
+static void testPwmDistinctAmplitudes() {
+    // Short / medium / long high pulses → distinct first-sample PCM (duty in ~23 cycles).
+    auto firstSample = [](uint32_t highCycles) -> int16_t {
+        blueshift::audio::EdgeToPcmRenderer r(44100);
+        r.reset(0, false);
+        r.pushEdge(1);
+        r.pushEdge(1 + highCycles);
+        int16_t s = 0;
+        r.render(&s, 1);
+        return s;
+    };
+    const int16_t shortS = firstSample(5);
+    const int16_t medS = firstSample(40);
+    const int16_t longS = firstSample(200);
+    CHECK(shortS > -blueshift::audio::kPcmAmplitude);
+    CHECK(medS > shortS);
+    CHECK(longS >= medS);
+}
+
 static void testJitterBufferAndTriplet() {
     blueshift::audio::EdgeJitterBuffer jb;
-    uint16_t d[3] = {1, 2, 3};
+    uint32_t d[3] = {1, 2, 3};
     CHECK(jb.pushBatch(0, 100, d, 3));
     CHECK(jb.size() == 3);
     blueshift::audio::TimedEdge e{};
@@ -434,6 +496,109 @@ static void testJitterBufferAndTriplet() {
     CHECK(blueshift::audioPathViable(t));
     t.audioConnected = false;
     CHECK(blueshift::hidBridgeViable(t)); // audio fail must not break HID viability
+}
+
+static void testAudioPipelineE2E() {
+    using namespace blueshift::protocol;
+    blueshift::audio::CapturingAudioOutput cap;
+    CHECK(cap.begin());
+    blueshift::audio::AudioPipeline pipe(cap);
+    pipe.markHidOk(true);
+    pipe.setStreamEnabled(true);
+    pipe.setSampleRate(44100);
+
+    uint8_t frame[128];
+    std::size_t n = ExtensionCodec::encodeControl(frame, sizeof(frame), StreamCommand::Start);
+    CHECK(pipe.onExtensionPayload(frame, n) == ParseResult::Ok);
+
+    SyncMarkerPayload sync{};
+    sync.sequence = 0;
+    sync.timelineCycle = 0;
+    sync.speakerLevel = 0;
+    n = ExtensionCodec::encodeSync(frame, sizeof(frame), sync);
+    CHECK(pipe.onExtensionPayload(frame, n) == ParseResult::Ok);
+
+    uint32_t deltas[8] = {510, 510, 510, 510, 510, 510, 510, 510};
+    n = ExtensionCodec::encodeEdgeBatch(frame, sizeof(frame), 1, 0, deltas, 8);
+    const auto pr = pipe.onExtensionPayload(frame, n);
+    CHECK(pr == ParseResult::Ok || pr == ParseResult::SequenceGap);
+
+    CHECK(pipe.pumpPcm(256) == 256);
+    int16_t pulled[128];
+    CHECK(pipe.onA2dpPull(pulled, 128) == 128);
+    bool any = false;
+    for (int i = 0; i < 128; ++i) {
+        if (pulled[i] != 0) {
+            any = true;
+            break;
+        }
+    }
+    CHECK(any);
+
+    auto diag = pipe.diagnostics();
+    CHECK(diag.protocolVersion == 1);
+    CHECK(diag.edges >= 1);
+    CHECK(diag.pcmSamples >= 256);
+
+    pipe.simulateAudioDisconnect();
+    CHECK(pipe.hidBridgeUnaffected());
+    blueshift::BridgeCore bridge;
+    bridge.apply(blueshift::BridgeEvent::BootDone);
+    bridge.apply(blueshift::BridgeEvent::InputPaired);
+    bridge.apply(blueshift::BridgeEvent::OutputPaired);
+    blueshift::NormalizedInput in{};
+    in.kind = blueshift::NormalizedInput::Kind::Gamepad;
+    in.gamepad.leftX = 42;
+    blueshift::NormalizedInput out{};
+    CHECK(bridge.onNormalizedInput(in, out));
+    CHECK(out.gamepad.leftX == 42);
+}
+
+static void testAudioUnderrunAndOverflow() {
+    blueshift::audio::CapturingAudioOutput cap;
+    cap.begin();
+    cap.startStream();
+    int16_t silence[16] = {};
+    // Pull with empty queue → underrun silence
+    CHECK(cap.pullPcm(silence, 16) == 16);
+    CHECK(cap.underrunCount() >= 16);
+
+    // Fill past capacity → overruns
+    int16_t ones[512];
+    for (int i = 0; i < 512; ++i) {
+        ones[i] = 100;
+    }
+    for (int k = 0; k < 20; ++k) {
+        cap.supplyPcm(ones, 512);
+    }
+    CHECK(cap.overrunCount() > 0);
+    CHECK(cap.pcmQueueDepth() <= blueshift::audio::CapturingAudioOutput::kPcmCap);
+}
+
+static void testSubsampleThroughPipeline() {
+    using namespace blueshift::protocol;
+    blueshift::audio::CapturingAudioOutput cap;
+    cap.begin();
+    blueshift::audio::AudioPipeline pipe(cap);
+    pipe.markHidOk(true);
+    pipe.setStreamEnabled(true);
+    pipe.setSampleRate(44100);
+
+    uint8_t frame[64];
+    std::size_t n = ExtensionCodec::encodeControl(frame, sizeof(frame), StreamCommand::Start);
+    pipe.onExtensionPayload(frame, n);
+    SyncMarkerPayload sync{};
+    sync.sequence = 0;
+    n = ExtensionCodec::encodeSync(frame, sizeof(frame), sync);
+    pipe.onExtensionPayload(frame, n);
+
+    uint32_t deltas[2] = {5, 5}; // sub-sample pulse
+    n = ExtensionCodec::encodeEdgeBatch(frame, sizeof(frame), 1, 0, deltas, 2);
+    pipe.onExtensionPayload(frame, n);
+    pipe.pumpPcm(4);
+    int16_t out[4] = {};
+    pipe.onA2dpPull(out, 4);
+    CHECK(out[0] != 0);
 }
 
 int main() {
@@ -454,9 +619,14 @@ int main() {
     testSelfTestAndHwCompare();
     testI18n();
     testExtensionProtocol();
+    testExtensionParserMalformed();
     testEdgeToPcmSubSamplePulse();
     testEdgeToPcmSquareAndDrift();
+    testPwmDistinctAmplitudes();
     testJitterBufferAndTriplet();
+    testAudioPipelineE2E();
+    testAudioUnderrunAndOverflow();
+    testSubsampleThroughPipeline();
     if (g_failures != 0) {
         std::printf("%d failure(s)\n", g_failures);
         return 1;

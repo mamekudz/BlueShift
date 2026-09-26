@@ -370,3 +370,24 @@ test("BlueShift Community License is present", () => {
   assert.match(branding, /UNDECIDED/);
   assert.match(branding, /Do \*\*not\*\* use ®/);
 });
+
+test("extension protocol V1 + audio fixtures exist", () => {
+  const proto = readFileSync(join(ROOT, "components/protocol/extension_protocol.h"), "utf8");
+  assert.match(proto, /kProtocolVersion = 1/);
+  assert.match(proto, /6b6c7565-5368-6966-7401/);
+  assert.match(proto, /FixedU16DeltaWithEscape/);
+  assert.match(proto, /kDeltaEscapeLarge/);
+  assert.doesNotMatch(proto, /BTstack/);
+
+  assert.ok(existsSync(join(ROOT, "docs/protocol/esp2-extension.md")));
+  assert.ok(existsSync(join(ROOT, "test/fixtures/audio/subsample_pulse.json")));
+  assert.ok(existsSync(join(ROOT, "test/fixtures/audio/pwm_varying.json")));
+  assert.ok(existsSync(join(ROOT, "components/audio/audio_pipeline.h")));
+  assert.ok(existsSync(join(ROOT, "docs/audio/a2dp-codec-path.md")));
+
+  const sub = JSON.parse(
+    readFileSync(join(ROOT, "test/fixtures/audio/subsample_pulse.json"), "utf8")
+  );
+  assert.equal(sub.expect.firstPcmSampleNonZero, true);
+  assert.ok(sub.edges[0].deltaCycles < 23);
+});

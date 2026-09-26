@@ -8,17 +8,17 @@
 namespace blueshift {
 namespace protocol {
 
-// Encode/decode EdgeBatch frames — no BLE / no A2DP dependencies.
+// Encode/decode V1 frames — no BLE / no A2DP dependencies.
 class ExtensionCodec {
 public:
-    // Returns bytes written, or 0 on failure.
+    // deltas[i] is cycle gap before edge i (from previous edge or baseCycle).
+    // Gaps >= 0xFFFF use escape encoding automatically.
     static std::size_t encodeEdgeBatch(uint8_t *out, std::size_t outCap, uint16_t sequence,
-                                       uint32_t baseCycle, const uint16_t *deltas,
+                                       uint32_t baseCycle, const uint32_t *deltas,
                                        uint16_t edgeCount);
 
-    // Returns true and fills outs; deltasOut must hold at least edgeCount.
     static bool decodeEdgeBatch(const uint8_t *in, std::size_t inLen, EdgeBatchHeader &hdr,
-                                uint16_t *deltasOut, uint16_t deltasCap);
+                                uint32_t *deltasOut, uint16_t deltasCap, uint16_t &decodedCount);
 
     static std::size_t encodeCaps(uint8_t *out, std::size_t outCap, const CapsPayload &caps);
     static bool decodeCaps(const uint8_t *in, std::size_t inLen, CapsPayload &caps);

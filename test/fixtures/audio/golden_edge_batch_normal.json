@@ -1,0 +1,20 @@
+{
+  "name": "golden_edge_batch_normal",
+  "protocolVersion": 1,
+  "description": "EdgeBatch sequence=7 baseCycle=1000 deltas=[10,20,30,40]",
+  "input": {
+    "frame": "EdgeBatch",
+    "sequence": 7,
+    "baseCycle": 1000,
+    "deltas": [10, 20, 30, 40]
+  },
+  "wireHex": "10 00 07 00 E8 03 00 00 04 00 0A 00 14 00 1E 00 28 00",
+  "expect": {
+    "sequence": 7,
+    "baseCycle": 1000,
+    "edgeCount": 4,
+    "deltas": [10, 20, 30, 40],
+    "reconstructedAbsCycles": [1010, 1030, 1060, 1100],
+    "byteLength": 18
+  }
+}

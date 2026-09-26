@@ -33,6 +33,23 @@ public:
         std::printf("[DIAG-JSON] {\"type\":\"hid\",\"dir\":\"%s\",\"kind\":\"%s\",\"seq\":%u}\n",
                     dir != nullptr ? dir : "", kind != nullptr ? kind : "", seq);
     }
+
+    // Machine field names are NOT localized (audio diagnostics).
+    static void emitAudio(uint16_t protocolVersion, uint32_t packets, uint32_t edges,
+                          uint32_t sequenceErrors, uint32_t resyncs, uint32_t underruns,
+                          uint32_t overruns, uint32_t pcmSamples, uint32_t sampleRate,
+                          bool audioConnected, bool streaming) {
+        std::printf(
+            "[DIAG-JSON] {\"type\":\"audio\",\"protocolVersion\":%u,\"packets\":%u,\"edges\":%u,"
+            "\"sequenceErrors\":%u,\"resyncs\":%u,\"underruns\":%u,\"overruns\":%u,"
+            "\"pcmSamples\":%u,\"sampleRate\":%u,\"audioConnected\":%s,\"streaming\":%s}\n",
+            static_cast<unsigned>(protocolVersion), static_cast<unsigned>(packets),
+            static_cast<unsigned>(edges), static_cast<unsigned>(sequenceErrors),
+            static_cast<unsigned>(resyncs), static_cast<unsigned>(underruns),
+            static_cast<unsigned>(overruns), static_cast<unsigned>(pcmSamples),
+            static_cast<unsigned>(sampleRate), audioConnected ? "true" : "false",
+            streaming ? "true" : "false");
+    }
 };
 
 enum class DiagItem : uint8_t {

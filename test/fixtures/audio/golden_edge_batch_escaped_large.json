@@ -1,0 +1,21 @@
+{
+  "name": "golden_edge_batch_escaped_large",
+  "protocolVersion": 1,
+  "description": "Delta 200000 requires escape 0xFFFF + uint32 LE",
+  "input": {
+    "frame": "EdgeBatch",
+    "sequence": 2,
+    "baseCycle": 100,
+    "deltas": [100, 200000]
+  },
+  "wireHex": "10 00 02 00 64 00 00 00 02 00 64 00 FF FF 40 0D 03 00",
+  "expect": {
+    "sequence": 2,
+    "baseCycle": 100,
+    "edgeCount": 2,
+    "deltas": [100, 200000],
+    "reconstructedAbsCycles": [200, 200200],
+    "escaped": true,
+    "noFakeEdgesInGap": true
+  }
+}

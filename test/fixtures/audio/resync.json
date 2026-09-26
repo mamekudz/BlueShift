@@ -1,0 +1,20 @@
+{
+  "name": "resync",
+  "apple2CyclesPerSecond": 1020484,
+  "startLevel": 0,
+  "sync": {
+    "afterEdgeIndex": 2,
+    "timelineCycle": 50000,
+    "speakerLevel": 1,
+    "sequence": 10,
+    "reason": 1
+  },
+  "edges": [
+    { "deltaCycles": 100, "sequence": 1 },
+    { "deltaCycles": 100, "sequence": 1 },
+    { "deltaCycles": 100, "sequence": 2 },
+    { "deltaCycles": 200, "sequence": 11 },
+    { "deltaCycles": 200, "sequence": 12 }
+  ],
+  "notes": "SyncMarker resets timeline/level/sequence mid-stream."
+}

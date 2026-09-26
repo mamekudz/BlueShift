@@ -248,9 +248,9 @@ ESP][ is the first intended consumer (ESP32-S3 Apple II emulator project). BlueS
 
 ### Experimental / Roadmap (audio)
 
-**Experimental ESP][ speaker-to-A2DP architecture under development.**
+**Experimental ESP][ speaker-to-Classic-Bluetooth audio bridge is under development.**
 
-Not a finished “Bluetooth audio bridge”. See [`docs/audio/architecture.md`](docs/audio/architecture.md).
+Not a finished “Bluetooth audio bridge”. Physical audio: UNVERIFIED. See [`docs/audio/architecture.md`](docs/audio/architecture.md) and [`docs/protocol/esp2-extension.md`](docs/protocol/esp2-extension.md).
 HID bridging remains the primary V1 capability.
 
 ---

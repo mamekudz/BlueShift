@@ -1,0 +1,15 @@
+{
+  "name": "subsample_pulse",
+  "apple2CyclesPerSecond": 1020484,
+  "startLevel": 0,
+  "sampleRatesHz": [44100, 48000],
+  "edges": [
+    { "deltaCycles": 5 },
+    { "deltaCycles": 5 }
+  ],
+  "expect": {
+    "firstPcmSampleNonZero": true,
+    "firstPcmSampleNotFullAmplitude": true
+  },
+  "notes": "Pulse of 5 cycles << one PCM sample (~23 cycles @ 44.1 kHz). Regression: non-zero PCM contribution."
+}

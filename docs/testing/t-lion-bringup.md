@@ -55,6 +55,43 @@ Compare DOCUMENTED vs DETECTED; do not auto-rewrite sdkconfig from runtime.
 
 ---
 
+## Optional audio (AFTER basic hardware / HID verification)
+
+**Status:** PLANNED — do not reorder basic board bring-up around optional audio.
+
+Only after steps 1–14 (or equivalent HID confidence):
+
+1. Pair Classic A2DP headphones/speaker
+2. Generate synthetic PCM (no ESP][ yet)
+3. Verify A2DP playback
+4. Connect ESP][ extension (discover Extension Service + Caps)
+5. Send synthetic speaker edges
+6. Verify reconstructed tone
+7. Test PWM / digitized fixture
+8. Run HID simultaneously (failure isolation)
+9. Measure HID latency impact
+10. Measure audio latency (provisional targets only)
+11. Stress reconnect (audio + HID)
+12. Measure memory / heap
+13. Measure battery impact
+
+Serial cues (concise — never every edge):
+
+```text
+[AUDIO] extension connected
+[AUDIO] stream start
+[AUDIO] A2DP connected
+[AUDIO] sequence gap expected=... got=...
+[AUDIO] resync
+[AUDIO] underrun
+```
+
+**Star Blazer** remains a SUBJECTIVE_REFERENCE for listening tests — do not store media here.
+
+Do not mark audio PHYSICALLY VERIFIED until executed on the T-Lion.
+
+---
+
 ## Stress / long-run (future physical)
 
 - 100 connect/disconnect cycles

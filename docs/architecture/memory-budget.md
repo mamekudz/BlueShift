@@ -33,7 +33,22 @@ Core Bluetooth bridging must **not** depend on PSRAM unless evidence proves othe
 | t-lion-idf-spike (dual) | 914852 / 1048576 (87.2%) | 44476 / 327680 (13.6%) | 1 MiB spike slot | 2026-09-26 |
 | **t-lion-idf-spike-triple** | **1038524 / 1048576 (99.0%)** | **60724 / 327680 (18.5%)** | HID Host+BLE HID+A2DP | 2026-09-26 |
 | t-lion-idf-spike-a2dp | 720804 / 1048576 (68.7%) | 50848 / 327680 (15.5%) | A2DP Source only | 2026-09-26 |
-| **t-lion-idf-release** | **852596 / 1966080 (43.4%)** | **46392 / 327680 (14.2%)** | production candidate | 2026-09-26 |
+| **t-lion-idf-release** | **852596 / 1966080 (43.4%)** | **46392 / 327680 (14.2%)** | production candidate HID | 2026-09-26 |
+
+## Audio extension static budget (HOST DESIGN — not yet flash-measured with full GATT)
+
+| Item | Bound | Notes |
+| --- | --- | --- |
+| Extension codec/parser | ~2–4 KiB flash | no third-party codec lib |
+| Edge jitter buffer | 1024 × 4 B ≈ 4 KiB | bounded; DropOldest |
+| Edge→PCM edge queue | 512 × 4 B ≈ 2 KiB | inside renderer |
+| PCM ring (A2DP supply) | 4–8 KiB | s16 mono |
+| A2DP production adapter | stack + Bluedroid | spike: +A2DP ≈ triple ~99% of 1 MiB slot |
+| Diagnostics counters | tens of bytes | BSS |
+
+**Compare:** HID-only production candidate (~852 KiB / 1.9 MiB) vs HID+A2DP spike (triple ~1.0 MiB / 1 MiB OTA slot — use no-OTA production layout).
+
+Runtime free heap with audio: UNKNOWN until physical bring-up.
 
 ## Runtime (pending physical)
 

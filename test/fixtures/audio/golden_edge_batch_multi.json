@@ -1,0 +1,19 @@
+{
+  "name": "golden_edge_batch_multi",
+  "protocolVersion": 1,
+  "description": "Eight edges approx 1 kHz square half-periods",
+  "input": {
+    "frame": "EdgeBatch",
+    "sequence": 1,
+    "baseCycle": 0,
+    "deltas": [510, 510, 510, 510, 510, 510, 510, 510]
+  },
+  "wireHex": "10 00 01 00 00 00 00 00 08 00 FE 01 FE 01 FE 01 FE 01 FE 01 FE 01 FE 01 FE 01",
+  "expect": {
+    "sequence": 1,
+    "baseCycle": 0,
+    "edgeCount": 8,
+    "deltas": [510, 510, 510, 510, 510, 510, 510, 510],
+    "reconstructedAbsCycles": [510, 1020, 1530, 2040, 2550, 3060, 3570, 4080]
+  }
+}

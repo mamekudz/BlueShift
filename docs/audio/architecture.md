@@ -117,7 +117,10 @@ Do **not** market “Bluetooth audio bridge” as finished.
 ## Related
 
 - [`docs/protocol/esp2-extension.md`](../protocol/esp2-extension.md)
+- [`docs/audio/a2dp-codec-path.md`](a2dp-codec-path.md)
+- [`docs/audio/generic-audio-future.md`](generic-audio-future.md)
 - [`docs/audio/bandwidth.md`](bandwidth.md)
 - [`docs/audio/a2dp-triple-role-spike.md`](a2dp-triple-role-spike.md)
 - [`docs/audio/licensing-a2dp.md`](licensing-a2dp.md)
 - [`docs/audio/role-conflicts.md`](role-conflicts.md)
+- [`test/fixtures/audio/README.md`](../../test/fixtures/audio/README.md)

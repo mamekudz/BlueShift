@@ -80,6 +80,10 @@ else()
         "${ROOT}/components/diagnostics/chip_info.cpp"
         "${ROOT}/components/diagnostics/hw_revision.cpp"
         "${ROOT}/components/bluetooth/bluetooth_error.cpp"
+        "${ROOT}/components/protocol/extension_codec.cpp"
+        "${ROOT}/components/protocol/extension_parser.cpp"
+        "${ROOT}/components/audio/edge_to_pcm.cpp"
+        "${ROOT}/components/audio/esp_idf_a2dp_audio_output.cpp"
     )
 
     target_sources(${COMPONENT_LIB} PRIVATE ${BLUESHIFT_PRODUCT_SRCS})
@@ -87,5 +91,7 @@ else()
         BLUESHIFT_BOARD_T_LION=1
         BLUESHIFT_NATIVE_ESP_IDF=1
         BLUESHIFT_ENABLE_ESP_IDF_BT=1
+        # Audio path is optional at runtime; stack A2DP remains gated by sdkconfig.
+        BLUESHIFT_AUDIO_PIPELINE=1
     )
 endif()

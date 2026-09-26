@@ -1,0 +1,20 @@
+{
+  "name": "golden_edge_batch_max_u16_delta",
+  "protocolVersion": 1,
+  "description": "Single delta at maximum normal uint16 (0xFFFE) — not escape",
+  "input": {
+    "frame": "EdgeBatch",
+    "sequence": 1,
+    "baseCycle": 0,
+    "deltas": [65534]
+  },
+  "wireHex": "10 00 01 00 00 00 00 00 01 00 FE FF",
+  "expect": {
+    "sequence": 1,
+    "baseCycle": 0,
+    "edgeCount": 1,
+    "deltas": [65534],
+    "reconstructedAbsCycles": [65534],
+    "escaped": false
+  }
+}

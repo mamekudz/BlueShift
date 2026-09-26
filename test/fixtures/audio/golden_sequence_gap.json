@@ -1,0 +1,22 @@
+{
+  "name": "golden_sequence_gap",
+  "protocolVersion": 1,
+  "description": "seq 0 then seq 2 — gap detected; soft resync to baseCycle of arriving packet",
+  "packets": [
+    {
+      "wireHex": "10 00 00 00 00 00 00 00 02 00 32 00 32 00",
+      "expect": { "sequence": 0, "deltas": [50, 50], "parse": "Ok" }
+    },
+    {
+      "wireHex": "10 00 02 00 C8 00 00 00 02 00 32 00 32 00",
+      "expect": {
+        "sequence": 2,
+        "baseCycle": 200,
+        "deltas": [50, 50],
+        "parse": "SequenceGap",
+        "sequenceErrorIncrement": 1
+      }
+    }
+  ],
+  "notes": "Missing seq=1. Do not invent edges for the gap. Prefer SyncMarker for hard timeline reset."
+}

@@ -1,0 +1,15 @@
+{
+  "name": "golden_sequence_progression",
+  "protocolVersion": 1,
+  "description": "Two consecutive EdgeBatches seq 1 then 2 — valid progression",
+  "packets": [
+    {
+      "wireHex": "10 00 01 00 00 00 00 00 02 00 0A 00 0A 00",
+      "expect": { "sequence": 1, "deltas": [10, 10], "parse": "Ok" }
+    },
+    {
+      "wireHex": "10 00 02 00 14 00 00 00 02 00 0A 00 0A 00",
+      "expect": { "sequence": 2, "deltas": [10, 10], "parse": "Ok" }
+    }
+  ]
+}

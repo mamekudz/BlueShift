@@ -1,0 +1,14 @@
+{
+  "name": "silence_gap",
+  "apple2CyclesPerSecond": 1020484,
+  "startLevel": 0,
+  "sampleRatesHz": [44100],
+  "edges": [
+    { "deltaCycles": 100 },
+    { "deltaCycles": 100 },
+    { "deltaCycles": 200000 },
+    { "deltaCycles": 100 },
+    { "deltaCycles": 100 }
+  ],
+  "notes": "Long gap requires escape encoding (delta >= 0xFFFF)."
+}

@@ -248,9 +248,9 @@ ESP][ ist der erste vorgesehene Abnehmer (ESP32-S3 Apple-II-Emulator-Projekt). B
 
 ### Experimentell / Roadmap (Audio)
 
-**Experimentelle ESP][-Speaker-zu-A2DP-Architektur in Entwicklung.**
+**Eine experimentelle ESP][→Classic-Bluetooth-Audio-Brücke befindet sich in Entwicklung.**
 
-Kein fertiger „Bluetooth-Audio-Bridge“-Anspruch. Siehe [`docs/audio/architecture.md`](docs/audio/architecture.md).
+Kein fertiger „Bluetooth-Audio-Bridge“-Anspruch. Physisches Audio: UNVERIFIED. Siehe [`docs/audio/architecture.md`](docs/audio/architecture.md) und [`docs/protocol/esp2-extension.md`](docs/protocol/esp2-extension.md).
 HID-Bridging bleibt die primäre V1-Fähigkeit.
 
 ---

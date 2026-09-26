@@ -1,0 +1,15 @@
+{
+  "name": "golden_duplicate_sequence",
+  "protocolVersion": 1,
+  "description": "Same EdgeBatch sequence twice — second is DuplicateSequence / drop",
+  "packets": [
+    {
+      "wireHex": "10 00 05 00 00 00 00 00 01 00 0A 00",
+      "expect": { "sequence": 5, "parse": "Ok" }
+    },
+    {
+      "wireHex": "10 00 05 00 00 00 00 00 01 00 0A 00",
+      "expect": { "sequence": 5, "parse": "DuplicateSequence" }
+    }
+  ]
+}

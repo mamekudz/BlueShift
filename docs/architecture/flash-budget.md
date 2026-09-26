@@ -81,3 +81,4 @@ Production headroom with no-OTA layout: **>1 MiB** free in app slot after dual-m
 | OLED / UI / i18x | Modest |
 | Profiles / diagnostics / config | Modest |
 | Future margin | Prefer no-OTA until size forces OTA redesign |
+| Audio (ESP][→A2DP) | Protocol/parser/PCM: small; A2DP stack dominates — use triple spike as upper bound (~99% of 1 MiB OTA slot). Production no-OTA retains headroom. Optional at runtime; not PHYSICALLY VERIFIED. |

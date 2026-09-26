@@ -1,0 +1,8 @@
+{
+  "name": "golden_control_stop",
+  "protocolVersion": 1,
+  "description": "Control STOP",
+  "input": { "frame": "Control", "command": 2 },
+  "wireHex": "02 02 00",
+  "expect": { "frame": "Control", "command": "Stop", "byteLength": 3 }
+}

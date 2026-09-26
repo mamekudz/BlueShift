@@ -1,0 +1,8 @@
+{
+  "name": "golden_malformed_unknown_type",
+  "protocolVersion": 1,
+  "description": "Unknown frame type 0x55 — drop as Malformed; do not crash",
+  "malformed": true,
+  "wireHex": "55 00 00",
+  "expect": { "parse": "Malformed", "unknownTypePolicy": "reject" }
+}

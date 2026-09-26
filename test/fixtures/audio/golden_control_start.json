@@ -1,0 +1,8 @@
+{
+  "name": "golden_control_start",
+  "protocolVersion": 1,
+  "description": "Control START (minimal valid control packet)",
+  "input": { "frame": "Control", "command": 1 },
+  "wireHex": "02 01 00",
+  "expect": { "frame": "Control", "command": "Start", "byteLength": 3 }
+}

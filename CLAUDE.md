@@ -115,6 +115,7 @@ Use project-owned interfaces such as:
     BatteryMonitor
     InputDevice
     DiagnosticLogger
+    A2dpAudioOutput
 
 This allows libraries to be replaced without rewriting the entire project.
 
@@ -800,3 +801,62 @@ The first successful bridge should be boring:
     stable reconnect
 
 Reliability is more important than feature count.
+
+
+# EXTENSION PROTOCOL / OPTIONAL AUDIO
+
+
+## 92. Extension Protocol V1
+
+The ESP][ / BlueShift speaker-edge contract is versioned Protocol **1**.
+
+Canonical definitions live in:
+
+    components/protocol/extension_protocol.h
+    docs/protocol/esp2-extension.md
+    test/fixtures/audio/
+
+Do not assume future protocol versions remain packet-compatible.
+
+All multi-byte integers on the wire are **little-endian**.
+
+
+## 93. Vendor UUID Stability
+
+Protocol V1 GATT UUIDs (`…7401` … `…7404`) are **STABLE**.
+
+Do not change them casually after freeze.
+
+Do not duplicate hard-coded UUID literals outside `extension_protocol.h`.
+
+Do not use Bluetooth SIG 16-bit UUID ranges for the Extension Service.
+
+
+## 94. Optional Audio — HID Survives
+
+Audio (ESP][ speaker edges → PCM → Classic A2DP) is **optional**.
+
+Primary V1 function remains Classic HID → BLE HID.
+
+A2DP failure, underrun, overflow, or malformed extension packets must **not**
+stop HID bridging.
+
+Treat extension payloads as untrusted external input.
+
+
+## 95. Apple II Edge Timeline
+
+Speaker timing originates on ESP][ as cycle-accurate edges.
+
+BlueShift must reconstruct PCM from the encoded Apple II timeline.
+
+Do not use BLE packet arrival intervals as the audio clock.
+
+Do not require ESP][ to send pre-rendered PCM.
+
+
+## 96. Unknown Extension Frames
+
+Unknown or future frame types must be rejected as malformed and dropped.
+
+Do not crash; do not invent speaker edges for gaps.

@@ -101,8 +101,9 @@ std::size_t EdgeToPcmRenderer::renderOne(int16_t *out) {
         timelineCycle_ += remaining;
     }
 
-    const int64_t avg = integral / static_cast<int64_t>(intervalCycles);
-    out[0] = static_cast<int16_t>(avg * kPcmAmplitude);
+    const int64_t avgScaled =
+        (integral * static_cast<int64_t>(kPcmAmplitude)) / static_cast<int64_t>(intervalCycles);
+    out[0] = static_cast<int16_t>(avgScaled);
     ++samplesRendered_;
     return 1;
 }

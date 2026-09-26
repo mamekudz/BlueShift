@@ -1,0 +1,17 @@
+{
+  "name": "pwm_varying",
+  "apple2CyclesPerSecond": 1020484,
+  "startLevel": 0,
+  "sampleRatesHz": [44100],
+  "edges": [
+    { "deltaCycles": 10 },
+    { "deltaCycles": 90 },
+    { "deltaCycles": 30 },
+    { "deltaCycles": 70 },
+    { "deltaCycles": 50 },
+    { "deltaCycles": 50 },
+    { "deltaCycles": 80 },
+    { "deltaCycles": 20 }
+  ],
+  "notes": "Varying high/low widths (PWM). Short/medium/long pulses must yield distinct average amplitudes after render."
+}

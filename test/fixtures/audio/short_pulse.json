@@ -1,0 +1,12 @@
+{
+  "name": "short_pulse",
+  "apple2CyclesPerSecond": 1020484,
+  "startLevel": 0,
+  "sampleRatesHz": [44100],
+  "edges": [
+    { "deltaCycles": 20 },
+    { "deltaCycles": 40 },
+    { "deltaCycles": 200 }
+  ],
+  "notes": "Short audible pulse then hold low."
+}

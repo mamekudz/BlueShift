@@ -1,7 +1,5 @@
 #include "protocol/extension_codec.h"
 
-#include <cstring>
-
 namespace blueshift {
 namespace protocol {
 namespace {
@@ -30,28 +28,50 @@ uint32_t readU32(const uint8_t *p) {
 } // namespace
 
 std::size_t ExtensionCodec::encodeEdgeBatch(uint8_t *out, std::size_t outCap, uint16_t sequence,
-                                            uint32_t baseCycle, const uint16_t *deltas,
+                                            uint32_t baseCycle, const uint32_t *deltas,
                                             uint16_t edgeCount) {
     if (out == nullptr || deltas == nullptr || edgeCount == 0 || edgeCount > kMaxEdgesPerFrame) {
         return 0;
     }
-    const std::size_t need = kEdgeBatchHeaderBytes + static_cast<std::size_t>(edgeCount) * 2u;
-    if (outCap < need) {
+    // Worst case: every delta escapes => 10 + edgeCount * 6
+    const std::size_t worst = kEdgeBatchHeaderBytes + static_cast<std::size_t>(edgeCount) * 6u;
+    if (outCap < worst && outCap < kEdgeBatchHeaderBytes + 2u) {
         return 0;
     }
     out[0] = static_cast<uint8_t>(FrameType::EdgeBatch);
-    out[1] = static_cast<uint8_t>(EdgeEncoding::FixedU16Delta);
+    out[1] = static_cast<uint8_t>(EdgeEncoding::FixedU16DeltaWithEscape);
     writeU16(out + 2, sequence);
     writeU32(out + 4, baseCycle);
     writeU16(out + 8, edgeCount);
+
+    std::size_t pos = kEdgeBatchHeaderBytes;
     for (uint16_t i = 0; i < edgeCount; ++i) {
-        writeU16(out + kEdgeBatchHeaderBytes + i * 2u, deltas[i]);
+        const uint32_t d = deltas[i];
+        if (d == 0 || d > kMaxReasonableDeltaCycles) {
+            return 0;
+        }
+        if (d < kDeltaEscapeLarge) {
+            if (pos + 2 > outCap) {
+                return 0;
+            }
+            writeU16(out + pos, static_cast<uint16_t>(d));
+            pos += 2;
+        } else {
+            if (pos + 6 > outCap) {
+                return 0;
+            }
+            writeU16(out + pos, kDeltaEscapeLarge);
+            writeU32(out + pos + 2, d);
+            pos += 6;
+        }
     }
-    return need;
+    return pos;
 }
 
 bool ExtensionCodec::decodeEdgeBatch(const uint8_t *in, std::size_t inLen, EdgeBatchHeader &hdr,
-                                     uint16_t *deltasOut, uint16_t deltasCap) {
+                                     uint32_t *deltasOut, uint16_t deltasCap,
+                                     uint16_t &decodedCount) {
+    decodedCount = 0;
     if (in == nullptr || deltasOut == nullptr || inLen < kEdgeBatchHeaderBytes) {
         return false;
     }
@@ -63,19 +83,39 @@ bool ExtensionCodec::decodeEdgeBatch(const uint8_t *in, std::size_t inLen, EdgeB
     hdr.sequence = readU16(in + 2);
     hdr.baseCycle = readU32(in + 4);
     hdr.edgeCount = readU16(in + 8);
-    if (hdr.encoding != static_cast<uint8_t>(EdgeEncoding::FixedU16Delta)) {
+    if (hdr.encoding != static_cast<uint8_t>(EdgeEncoding::FixedU16DeltaWithEscape)) {
         return false;
     }
     if (hdr.edgeCount == 0 || hdr.edgeCount > kMaxEdgesPerFrame || hdr.edgeCount > deltasCap) {
         return false;
     }
-    const std::size_t need = kEdgeBatchHeaderBytes + static_cast<std::size_t>(hdr.edgeCount) * 2u;
-    if (inLen < need) {
+    std::size_t pos = kEdgeBatchHeaderBytes;
+    for (uint16_t i = 0; i < hdr.edgeCount; ++i) {
+        if (pos + 2 > inLen) {
+            return false;
+        }
+        const uint16_t raw = readU16(in + pos);
+        pos += 2;
+        uint32_t d = 0;
+        if (raw == kDeltaEscapeLarge) {
+            if (pos + 4 > inLen) {
+                return false;
+            }
+            d = readU32(in + pos);
+            pos += 4;
+        } else {
+            d = raw;
+        }
+        if (d == 0 || d > kMaxReasonableDeltaCycles) {
+            return false;
+        }
+        deltasOut[i] = d;
+    }
+    if (pos != inLen) {
+        // Trailing bytes = malformed (strict).
         return false;
     }
-    for (uint16_t i = 0; i < hdr.edgeCount; ++i) {
-        deltasOut[i] = readU16(in + kEdgeBatchHeaderBytes + i * 2u);
-    }
+    decodedCount = hdr.edgeCount;
     return true;
 }
 
@@ -123,23 +163,25 @@ bool ExtensionCodec::decodeControl(const uint8_t *in, std::size_t inLen, Control
 
 std::size_t ExtensionCodec::encodeSync(uint8_t *out, std::size_t outCap,
                                        const SyncMarkerPayload &sync) {
-    if (out == nullptr || outCap < 8) {
+    if (out == nullptr || outCap < 9) {
         return 0;
     }
     out[0] = static_cast<uint8_t>(FrameType::SyncMarker);
     writeU16(out + 1, sync.sequence);
     writeU32(out + 3, sync.timelineCycle);
-    out[7] = sync.reason;
-    return 8;
+    out[7] = sync.speakerLevel ? 1 : 0;
+    out[8] = sync.reason;
+    return 9;
 }
 
 bool ExtensionCodec::decodeSync(const uint8_t *in, std::size_t inLen, SyncMarkerPayload &sync) {
-    if (in == nullptr || inLen < 8 || in[0] != static_cast<uint8_t>(FrameType::SyncMarker)) {
+    if (in == nullptr || inLen < 9 || in[0] != static_cast<uint8_t>(FrameType::SyncMarker)) {
         return false;
     }
     sync.sequence = readU16(in + 1);
     sync.timelineCycle = readU32(in + 3);
-    sync.reason = in[7];
+    sync.speakerLevel = in[7] ? 1 : 0;
+    sync.reason = in[8];
     return true;
 }
 

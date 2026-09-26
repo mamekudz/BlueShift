@@ -20,8 +20,10 @@
     "backup:all": "gulp backup:all",
     "test:infra": "node --test dev/tools/infra.test.mjs",
     "test:host": "node --test dev/tools/host_logic.test.mjs",
+    "test:audio": "node --test dev/tools/audio_pipeline.test.mjs",
+    "test:protocol": "node --test dev/tools/protocol_v1_golden.test.mjs",
     "test:host:native": "pio run -e native",
-    "test": "npm run test:infra && npm run test:host",
+    "test": "npm run test:infra && npm run test:host && npm run test:audio && npm run test:protocol",
     "gulp:tasks": "gulp --tasks"
   },
   "microgulp": {

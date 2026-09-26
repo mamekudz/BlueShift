@@ -1,0 +1,11 @@
+{
+  "name": "packet_loss",
+  "apple2CyclesPerSecond": 1020484,
+  "startLevel": 0,
+  "batches": [
+    { "sequence": 0, "baseCycle": 0, "deltas": [50, 50] },
+    { "sequence": 1, "baseCycle": 100, "deltas": [50, 50], "drop": true },
+    { "sequence": 2, "baseCycle": 200, "deltas": [50, 50] }
+  ],
+  "notes": "Sequence gap 0→2: parser flags SequenceGap and soft-resyncs to baseCycle."
+}
