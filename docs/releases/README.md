@@ -74,7 +74,7 @@ Technical IDs stay stable. Visible names are dynamic:
 
 When pending merges exist, the update task may show **µAttention** (`ACTION_AVAILABLE`, not a build failure). After sync, attention clears via `NotifyTasksChanged`.
 
-Group: **Release** (alongside Docs / Git / Backup — ESP][-aligned).
+Group: **Release** (alongside Firmware / Tools / Docs / Git / Backup — ESP][-aligned).
 
 ---
 

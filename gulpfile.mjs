@@ -2,13 +2,16 @@
 // BlueShift — µGulp / Gulp task runner
 // © 2026 Meinolf Amekudzi
 //
-// Groups (family-aligned with ESP][):
-//   Docs    — help / docs / format / format:check / check
-//   Release — releases:update / releases:history
-//   Git     — backup:git
-//   Backup  — backup / backup:nas / backup:all
+// Groups (ESP][-aligned):
+//   Firmware — build / rebuild / flash / upload / size / clean
+//   Tools    — devices / monitor
+//   Docs     — help / docs / format / format:check / check
+//   Release  — releases:update / releases:history
+//   Git      — backup:git  (publication checkpoint — NOT a backup)
+//   Backup   — backup / backup:all  (NAS only; backup:nas = CLI alias only)
 //
-// NAS form = microGulp BACKUP_TO_NAS / Watchy / esp2 pattern (destination1..3).
+// Display names use en-US keys + i18x/gulp/{en-US,de-DE}.json.
+// Version via µGulp <version/> (RELEASES.json / package.json).
 // Default = help (safe — never builds firmware, commits, or touches NAS).
 //================================================================
 
@@ -49,26 +52,41 @@ import {
   CountPendingContributorMerges,
   MergeDeveloperReleases,
 } from "./dev/tools/releases/release-merge.mjs";
+import { BuildReleaseHistoryAccordion } from "./dev/tools/releases/release-history.mjs";
+import { GetProjectVersionLabel } from "./dev/tools/project-version.mjs";
 import {
-  BuildReleaseHistoryAccordion,
-} from "./dev/tools/releases/release-history.mjs";
+  AskPort,
+  ListPorts,
+  MonitorArgs,
+  Pio,
+  PIO_ENVS,
+  ResolvePioEnv,
+  UploadArgs,
+} from "./dev/tools/pio.mjs";
 
 InstallStringExtensions();
 
-export const µI18xContext = { project: "blueshift", product: "BlueShift" };
+const rootDir = dirname(fileURLToPath(import.meta.url));
 
-/** Dashboard start layout for µGroup sections (ESP][-aligned names). */
+/** i18x placeholders — version from RELEASES.json (ß when beta). */
+export const µI18xContext = {
+  project: "blueshift",
+  product: "BlueShift",
+  version: GetProjectVersionLabel(rootDir),
+};
+
+/** Dashboard start layout for µGroup sections. */
 export const µGroups = {
   collapsed: false,
   groups: {
-    'Docs<context="µGroup"/>': "open",
+    'Firmware<context="µGroup"/>': "open",
+    'Tools<context="µGroup"/>': "open",
+    'Docs<context="µGroup"/>': "collapsed",
     'Release<context="µGroup"/>': "open",
     'Git<context="µGroup"/>': "open",
     'Backup<context="µGroup"/>': "open",
   },
 };
-
-const rootDir = dirname(fileURLToPath(import.meta.url));
 
 /**
  * @param {Function} _task
@@ -127,57 +145,238 @@ function _PendingReleaseMerges() {
   return CountPendingContributorMerges(_ReleaseMergeOptions());
 }
 
+/** Keep i18x keys stable — never bake numbers/locale into the registered phrase. */
 function _ReleasesUpdateDisplayName() {
-  const pending = _PendingReleaseMerges();
-  if (pending <= 0) {
-    return 'Release history up to date<context="µDisplayName"/>'.i18xRegister();
+  if (_PendingReleaseMerges() <= 0) {
+    return 'Release history up to date V<version/><context="µDisplayName"/>'.i18xRegister();
   }
-  return `Update release history — ${pending} pending<context="µDisplayName"/>`.i18xRegister();
+  return 'Update release history — pending V<version/><context="µDisplayName"/>'.i18xRegister();
 }
 
-function _ReleasesHistoryDisplayName() {
-  const paths = ReleasesPaths(rootDir);
-  const accordion = BuildReleaseHistoryAccordion({
-    releasesPath: paths.releasesPath,
-    root: rootDir,
-    lid: "en-US",
-    maxReleases: 1,
-  });
-  if (!accordion.items.length) {
-    return 'Release history — 0 entries<context="µDisplayName"/>'.i18xRegister();
+function firmwareEnv() {
+  try {
+    const p = GetParameter("env");
+    if (p) return ResolvePioEnv(String(p));
+  } catch {
+    /* outside µGulp */
   }
-  return `Release history — ${accordion.versionLabel}<context="µDisplayName"/>`.i18xRegister();
+  return ResolvePioEnv();
 }
 
 //================================================================
-// Help (default)
+// Firmware
+//================================================================
+
+export async function build() {
+  ReportProgress(0, "build");
+  const env = firmwareEnv();
+  Log('Building BlueShift firmware (env <env/>)…<context="task log"/>', { env });
+  await Pio(rootDir, ["run", "-e", env], "pio build");
+  ReportProgress(1, "build");
+  Log('Build OK.<context="task log"/>');
+  PlaySignal("success");
+}
+_Tag(build, {
+  gulpName: "build",
+  µDisplayName: 'Build Firmware V<version/><context="µDisplayName"/>',
+  µDescription:
+    'Compiles BlueShift with PlatformIO. Default env t-lion-idf-debug (BLUESHIFT_PIO_ENV).<context="µDescription"/>',
+  µIcon: "\u2692",
+  µGroup: 'Firmware<context="µGroup"/>',
+  µOrder: 10,
+  µExecutionConcurrency: false,
+});
+
+export async function flash() {
+  ReportProgress(0, "flash-build");
+  const env = firmwareEnv();
+  const port = await AskPort(rootDir, "Flash port (build + upload)");
+  Log('Build + upload → <port/> (env <env/>)…<context="task log"/>', {
+    port: port ?? "auto/ini",
+    env,
+  });
+  await Pio(rootDir, ["run", "-e", env], "pio build");
+  ReportProgress(0.55, "flash-upload");
+  await Pio(rootDir, UploadArgs(port, env), "pio upload");
+  ReportProgress(1, "flash-upload");
+  Log('Flash finished.<context="task log"/>');
+  PlaySignal("success");
+}
+_Tag(flash, {
+  gulpName: "flash",
+  µDisplayName: 'Build & Upload V<version/><context="µDisplayName"/>',
+  µDescription:
+    'Rebuilds and flashes BlueShift firmware in one step.<context="µDescription"/>',
+  µTooltip:
+    'Set BLUESHIFT_PORT=COMx to skip the port dialog.<context="µTooltip"/>',
+  µIcon: "\u26A1",
+  µGroup: 'Firmware<context="µGroup"/>',
+  µOrder: 15,
+  µExecutionConcurrency: false,
+  µExecutionRestrictions: { deny: ["upload", "build", "backup"] },
+});
+
+export async function upload() {
+  ReportProgress(0, "upload");
+  const env = firmwareEnv();
+  const port = await AskPort(rootDir, "Upload port");
+  Log('Uploading → <port/> (env <env/>)…<context="task log"/>', {
+    port: port ?? "auto/ini",
+    env,
+  });
+  await Pio(rootDir, UploadArgs(port, env), "pio upload");
+  ReportProgress(1, "upload");
+  Log('Upload finished.<context="task log"/>');
+  PlaySignal("success");
+}
+_Tag(upload, {
+  gulpName: "upload",
+  µDisplayName: 'Upload Firmware V<version/><context="µDisplayName"/>',
+  µDescription:
+    'Flashes the last build. Asks for the COM port.<context="µDescription"/>',
+  µTooltip:
+    'Set BLUESHIFT_PORT=COMx to skip the port dialog.<context="µTooltip"/>',
+  µIcon: "\u2191",
+  µGroup: 'Firmware<context="µGroup"/>',
+  µOrder: 20,
+  µExecutionConcurrency: false,
+  µExecutionRestrictions: { deny: ["flash", "monitor", "backup"] },
+});
+
+export async function size() {
+  ReportProgress(0, "size");
+  await Pio(rootDir, ["run", "-e", firmwareEnv(), "-t", "size"], "pio size");
+  ReportProgress(1, "size");
+}
+_Tag(size, {
+  gulpName: "size",
+  µDisplayName: 'Memory Size V<version/><context="µDisplayName"/>',
+  µDescription:
+    'Shows RAM / Flash usage of the last firmware build.<context="µDescription"/>',
+  µIcon: "\u25A6",
+  µGroup: 'Firmware<context="µGroup"/>',
+  µOrder: 30,
+  µExecutionConcurrency: true,
+});
+
+export async function clean() {
+  ReportProgress(0, "clean");
+  await Pio(rootDir, ["run", "-e", firmwareEnv(), "-t", "clean"], "pio clean");
+  ReportProgress(1, "clean");
+  Log('Build artefacts removed.<context="task log"/>');
+}
+_Tag(clean, {
+  gulpName: "clean",
+  µDisplayName: 'Clean Build V<version/><context="µDisplayName"/>',
+  µDescription:
+    'Removes .pio/build artefacts for the active PlatformIO env.<context="µDescription"/>',
+  µIcon: "\u239A",
+  µGroup: 'Firmware<context="µGroup"/>',
+  µOrder: 40,
+  µExecutionConcurrency: true,
+});
+
+export const rebuild = gulp.series(clean, build);
+_Tag(rebuild, {
+  gulpName: "rebuild",
+  µDisplayName: 'Rebuild Firmware V<version/><context="µDisplayName"/>',
+  µDescription: 'clean → build for the active PlatformIO env.<context="µDescription"/>',
+  µIcon: "\u21BB",
+  µGroup: 'Firmware<context="µGroup"/>',
+  µOrder: 12,
+  µExecutionConcurrency: false,
+  µExecutionRestrictions: { deny: ["flash", "upload", "backup"] },
+});
+
+export async function firmwareEnvTask() {
+  const env = firmwareEnv();
+  Log('Active PlatformIO env: <env/><context="task log"/>', { env });
+  Log('Known envs: <list/><context="task log"/>', { list: PIO_ENVS.join(", ") });
+}
+_Tag(firmwareEnvTask, {
+  gulpName: "firmware:env",
+  µDisplayName: 'Show Firmware Env V<version/><context="µDisplayName"/>',
+  µDescription:
+    'Prints the active PlatformIO environment and known envs.<context="µDescription"/>',
+  µGroup: 'Firmware<context="µGroup"/>',
+  µIcon: "\u2139",
+  µOrder: 5,
+  µExecutionConcurrency: true,
+});
+
+//================================================================
+// Tools
+//================================================================
+
+export async function devices() {
+  ReportProgress(0, "devices");
+  const ports = await ListPorts(rootDir);
+  if (ports.length === 0) {
+    Warn('No serial ports detected.<context="task log"/>');
+  } else {
+    Log('Serial ports:<context="task log"/>');
+    for (const p of ports) {
+      Log('  <port/><context="task log"/>', { port: p.label });
+    }
+  }
+  await Pio(rootDir, ["device", "list"], "pio device list");
+  ReportProgress(1, "devices");
+}
+_Tag(devices, {
+  gulpName: "devices",
+  µDisplayName: 'List Devices V<version/><context="µDisplayName"/>',
+  µDescription: 'Lists connected serial ports.<context="µDescription"/>',
+  µIcon: "\u2398",
+  µGroup: 'Tools<context="µGroup"/>',
+  µOrder: 10,
+  µExecutionConcurrency: true,
+});
+
+export async function monitor() {
+  const port = await AskPort(rootDir, "Serial monitor port");
+  Log('Opening serial monitor (Ctrl+C to stop)…<context="task log"/>');
+  await Pio(rootDir, MonitorArgs(port), "pio monitor");
+}
+_Tag(monitor, {
+  gulpName: "monitor",
+  µDisplayName: 'Serial Monitor V<version/><context="µDisplayName"/>',
+  µDescription:
+    'Opens the PlatformIO serial monitor at 115200 baud.<context="µDescription"/>',
+  µTooltip:
+    'Set BLUESHIFT_PORT=COMx to skip the port dialog.<context="µTooltip"/>',
+  µIcon: "\u2399",
+  µGroup: 'Tools<context="µGroup"/>',
+  µOrder: 20,
+  µExecutionConcurrency: false,
+});
+
+//================================================================
+// Help / Docs
 //================================================================
 
 const TASK_HELP = [
   ["help", "Show this task list (default — safe)"],
-  ["docs", "Compose README.md + README.de-DE.md from locale sources + compatibility table"],
-  ["format", "Run clang-format -i on project C/C++ sources"],
-  ["format:check", "Check clang-format without writing"],
-  ["check", "format:check + optional pio check (if PlatformIO available)"],
-  ["releases:update", "Merge dev/releases/*.json → RELEASES.json (30-day, idempotent)"],
-  ["releases:history", "Show localized release history from RELEASES.json"],
-  ["backup:git", "Explicit Git checkpoint (shows staged files; never force)"],
-  ["backup / backup:nas", "NAS backup to 0–3 destinations"],
-  ["backup:all", "docs → backup:git → backup (NAS)"],
+  ["build / flash / upload", "Firmware (default env t-lion-idf-debug)"],
+  ["devices / monitor", "Serial tools"],
+  ["docs", "Compose README.md + README.de-DE.md"],
+  ["format / format:check / check", "Format and optional pio check"],
+  ["releases:update / releases:history", "RELEASES.json history"],
+  ["backup:git", "Git publication checkpoint (not a backup)"],
+  ["backup", "NAS backup (0–3 destinations)"],
+  ["backup:all", "docs → Git publish → NAS"],
 ];
 
 export async function help() {
   Log('BlueShift µGulp tasks (package: blueshift)<context="task log"/>');
   Log('Default task is help — no firmware build, commit, or NAS access.<context="task log"/>');
   for (const [name, desc] of TASK_HELP) {
-    Log(`  ${name.padEnd(22)} ${desc}<context="task log"/>`);
+    Log(`  ${name.padEnd(28)} ${desc}<context="task log"/>`);
   }
-  Log('npm scripts mirror these names. Infra tests: npm run test:infra<context="task log"/>');
   PlaySignal("success");
 }
 _Tag(help, {
   gulpName: "help",
-  µDisplayName: 'Help<context="µDisplayName"/>',
+  µDisplayName: 'Help V<version/><context="µDisplayName"/>',
   µDescription:
     'Lists BlueShift Gulp tasks. Safe default — no build, commit, or NAS.<context="µDescription"/>',
   µGroup: 'Docs<context="µGroup"/>',
@@ -185,10 +384,6 @@ _Tag(help, {
   µOrder: 1,
   µExecutionConcurrency: true,
 });
-
-//================================================================
-// Docs
-//================================================================
 
 export async function docs() {
   ReportProgress(0, "docs");
@@ -215,7 +410,7 @@ export async function docs() {
 }
 _Tag(docs, {
   gulpName: "docs",
-  µDisplayName: 'Compose README<context="µDisplayName"/>',
+  µDisplayName: 'Compose README V<version/><context="µDisplayName"/>',
   µDescription:
     'Generates README.md and README.de-DE.md from en-US/de-DE sources and injects the compatibility table from devices.json.<context="µDescription"/>',
   µGroup: 'Docs<context="µGroup"/>',
@@ -242,7 +437,7 @@ export async function format() {
 }
 _Tag(format, {
   gulpName: "format",
-  µDisplayName: 'Format C/C++<context="µDisplayName"/>',
+  µDisplayName: 'Format C/C++ V<version/><context="µDisplayName"/>',
   µDescription:
     'Runs clang-format -i on src/, include/, components/, test/. Requires clang-format on PATH or CLANG_FORMAT.<context="µDescription"/>',
   µGroup: 'Docs<context="µGroup"/>',
@@ -264,7 +459,7 @@ export async function FORMAT_CHECK() {
 }
 _Tag(FORMAT_CHECK, {
   gulpName: "format:check",
-  µDisplayName: 'Check C/C++ format<context="µDisplayName"/>',
+  µDisplayName: 'Check C/C++ format V<version/><context="µDisplayName"/>',
   µDescription:
     'clang-format --dry-run --Werror on project sources. Soft-skips if clang-format is missing.<context="µDescription"/>',
   µGroup: 'Docs<context="µGroup"/>',
@@ -273,9 +468,6 @@ _Tag(FORMAT_CHECK, {
   µExecutionConcurrency: false,
 });
 
-/**
- * @param {string[]} _args
- */
 function _PioAvailable() {
   return new Promise((resolve) => {
     const child = spawn("pio", ["--version"], {
@@ -291,37 +483,11 @@ export async function check() {
   ReportProgress(0, "check");
   const fmt = await FORMAT_CHECK();
   ReportProgress(0.5, "check");
-
   const pioOk = await _PioAvailable();
   if (!pioOk) {
-    const homePio = process.env.USERPROFILE
-      ? `${process.env.USERPROFILE}\\.platformio\\penv\\Scripts\\pio.exe`
-      : "";
-    let usedAlt = false;
-    if (homePio && existsSync(homePio)) {
-      usedAlt = true;
-      Log('Running PlatformIO check via local penv…<context="task log"/>');
-      await new Promise((resolve, reject) => {
-        const child = spawn(homePio, ["check", "-e", "skeleton", "--skip-packages"], {
-          cwd: rootDir,
-          windowsHide: true,
-          stdio: "inherit",
-        });
-        child.on("error", reject);
-        child.on("close", (code) => {
-          if (code === 0) resolve();
-          else {
-            Warn(`pio check exit ${code} (non-fatal for milestone 1)<context="task warning"/>`);
-            resolve();
-          }
-        });
-      });
-    }
-    if (!usedAlt) {
-      Warn(
-        'PlatformIO CLI not on PATH — skipped pio check. Install PlatformIO or add it to PATH.<context="task warning"/>'
-      );
-    }
+    Warn(
+      'PlatformIO CLI not on PATH — skipped pio check.<context="task warning"/>'
+    );
   } else {
     Log('Running pio check -e skeleton…<context="task log"/>');
     await new Promise((resolve) => {
@@ -331,22 +497,16 @@ export async function check() {
         stdio: "inherit",
       });
       child.on("error", () => resolve());
-      child.on("close", (code) => {
-        if (code !== 0) {
-          Warn(`pio check exit ${code} (non-fatal for milestone 1)<context="task warning"/>`);
-        }
-        resolve();
-      });
+      child.on("close", () => resolve());
     });
   }
-
   ReportProgress(1, "check");
   if (fmt.ok || fmt.reason === "missing-clang-format") PlaySignal("success");
   return fmt;
 }
 _Tag(check, {
   gulpName: "check",
-  µDisplayName: 'Project checks<context="µDisplayName"/>',
+  µDisplayName: 'Project checks V<version/><context="µDisplayName"/>',
   µDescription:
     'format:check plus optional PlatformIO cppcheck when available. Does not flash hardware.<context="µDescription"/>',
   µGroup: 'Docs<context="µGroup"/>',
@@ -356,7 +516,7 @@ _Tag(check, {
 });
 
 //================================================================
-// Release history (RELEASES.json)
+// Release history
 //================================================================
 
 export async function RELEASES_UPDATE() {
@@ -378,11 +538,7 @@ export async function RELEASES_UPDATE() {
       invalid: summary.invalid,
     }
   );
-  if (summary.authors.length) {
-    Log('authors: <authors/><context="task log"/>', {
-      authors: summary.authors.join(", "),
-    });
-  }
+  µI18xContext.version = GetProjectVersionLabel(rootDir);
   SetTaskEmphasis("RELEASES_UPDATE", null);
   NotifyTasksChanged();
   ReportProgress(1, "releases-update");
@@ -417,7 +573,7 @@ export async function RELEASES_HISTORY() {
     const active = typeof GetLid === "function" ? GetLid() : null;
     if (active === "de-DE" || active === "en-US") lid = active;
   } catch {
-    /* CLI without i18xe */
+    /* CLI */
   }
   const accordion = BuildReleaseHistoryAccordion({
     releasesPath: paths.releasesPath,
@@ -429,7 +585,6 @@ export async function RELEASES_HISTORY() {
     'Release history: <count format="int"/> version block(s), <entries format="int"/> info line(s).<context="task log"/>',
     { count: accordion.items.length, entries: accordion.entryCount }
   );
-  // LogAccordion renders a dashboard accordion under µGulp and ASCII on CLI.
   LogAccordion(accordion);
   ReportProgress(1, "releases-history");
   PlaySignal("success");
@@ -437,7 +592,7 @@ export async function RELEASES_HISTORY() {
 }
 _Tag(RELEASES_HISTORY, {
   gulpName: "releases:history",
-  µDisplayName: () => _ReleasesHistoryDisplayName(),
+  µDisplayName: 'Release history V<version/><context="µDisplayName"/>',
   µDescription:
     'Shows localized BlueShift release history from RELEASES.json (date, version, info lines). Does not dump raw JSON.<context="µDescription"/>',
   µTooltip:
@@ -516,7 +671,6 @@ async function _ResolveNasForRun() {
     });
   }
 
-  // Non-interactive CLI: prefer local config / zero targets over blocking form
   const local = LoadNasLocalDefaults(rootDir);
   if (local.t1 || local.t2 || local.t3 || process.env.BLUESHIFT_NAS_ALLOW_FORM === "1") {
     if (process.env.BLUESHIFT_NAS_ALLOW_FORM === "1") {
@@ -642,20 +796,24 @@ async function _RunNasBackup() {
   };
 }
 
+//================================================================
+// Git — publication checkpoint (NOT a backup)
+//================================================================
+
 export async function BACKUP_GIT() {
-  ReportProgress(0, "backup-git");
+  ReportProgress(0, "git-publish");
   const result = await RunGitBackup(rootDir, {
     log: (m) => Log(m + '<context="task log"/>'),
     warn: (m) => Warn(m + '<context="task warning"/>'),
   });
-  ReportProgress(1, "backup-git");
+  ReportProgress(1, "git-publish");
   if (result.ok) PlaySignal("success");
   else if (result.reason === "not-a-repo") {
     Warn(
-      'Git backup skipped — no .git yet. Run git init when ready.<context="task warning"/>'
+      'Git publish skipped — no .git yet. Run git init when ready.<context="task warning"/>'
     );
   } else {
-    Warn('Git backup status: <reason/><context="task warning"/>', {
+    Warn('Git publish status: <reason/><context="task warning"/>', {
       reason: result.reason,
     });
   }
@@ -663,21 +821,25 @@ export async function BACKUP_GIT() {
 }
 _Tag(BACKUP_GIT, {
   gulpName: "backup:git",
-  µDisplayName: 'Git backup checkpoint<context="µDisplayName"/>',
+  µDisplayName: 'Publish Git checkpoint V<version/><context="µDisplayName"/>',
   µDescription:
-    'Checkpoint commit including CLAUDE.md. Shows staged files first. Pushes when a remote exists. Never force-pushes or hard-resets.<context="µDescription"/>',
+    'Publishes a Git checkpoint commit (CLAUDE.md included). Shows staged files first. Pushes when a remote exists. Never force-pushes. This is publication, not backup — use NAS for private backup.<context="µDescription"/>',
   µGroup: 'Git<context="µGroup"/>',
   µIcon: "\uE902",
   µOrder: 10,
   µExecutionConcurrency: false,
 });
 
+//================================================================
+// Backup — NAS only (no duplicate alias in the dashboard)
+//================================================================
+
 export async function backup() {
   return _RunNasBackup();
 }
 _Tag(backup, {
   gulpName: "backup",
-  µDisplayName: 'Backup to NAS<context="µDisplayName"/>',
+  µDisplayName: 'Backup to NAS V<version/><context="µDisplayName"/>',
   µDescription:
     'Copies BlueShift sources and valuable local/reference assets (incl. gitignored 3dprint/vendor CAD when present) to up to three NAS folders. Zero targets is valid. Skips node_modules, .pio, disposable caches, .env.<context="µDescription"/>',
   µTooltip:
@@ -685,20 +847,6 @@ _Tag(backup, {
   µGroup: 'Backup<context="µGroup"/>',
   µIcon: "\uE902",
   µOrder: 30,
-  µExecutionConcurrency: false,
-  µParameters: _NasBackupParameters(),
-});
-
-export async function BACKUP_NAS() {
-  return _RunNasBackup();
-}
-_Tag(BACKUP_NAS, {
-  gulpName: "backup:nas",
-  µDisplayName: 'Backup to NAS (alias)<context="µDisplayName"/>',
-  µDescription: 'Alias of backup — NAS destinations 0–3.<context="µDescription"/>',
-  µGroup: 'Backup<context="µGroup"/>',
-  µIcon: "\uE902",
-  µOrder: 31,
   µExecutionConcurrency: false,
   µParameters: _NasBackupParameters(),
 });
@@ -715,8 +863,9 @@ export async function BACKUP_ALL() {
 }
 _Tag(BACKUP_ALL, {
   gulpName: "backup:all",
-  µDisplayName: 'Backup all (docs + Git + NAS)<context="µDisplayName"/>',
-  µDescription: 'Runs docs, backup:git, then backup (NAS).<context="µDescription"/>',
+  µDisplayName: 'Docs + Git publish + NAS V<version/><context="µDisplayName"/>',
+  µDescription:
+    'Runs docs, Git publication checkpoint (backup:git), then NAS backup.<context="µDescription"/>',
   µGroup: 'Backup<context="µGroup"/>',
   µIcon: "\uE902",
   µOrder: 40,
@@ -732,8 +881,10 @@ export default help;
 gulp.task("default", help);
 gulp.task("help", help);
 gulp.task("format:check", FORMAT_CHECK);
+gulp.task("firmware:env", firmwareEnvTask);
 gulp.task("releases:update", RELEASES_UPDATE);
 gulp.task("releases:history", RELEASES_HISTORY);
 gulp.task("backup:git", BACKUP_GIT);
-gulp.task("backup:nas", BACKUP_NAS);
+/** CLI/npm alias only — not exported, so it does not appear in the µGulp dashboard. */
+gulp.task("backup:nas", backup);
 gulp.task("backup:all", BACKUP_ALL);

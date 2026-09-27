@@ -87,7 +87,7 @@ test("NAS excludes regenerable trees", () => {
 test("checkpoint message format", () => {
   assert.equal(
     BackupCommitMessage(new Date(2026, 8, 25, 19, 7)),
-    "backup: BlueShift 2026-09-25 19:07"
+    "publish: BlueShift 2026-09-25 19:07"
   );
 });
 
@@ -103,24 +103,48 @@ test("readme filter strips note/website and is deterministic", () => {
   assert.doesNotMatch(a, /drop/);
 });
 
-test("µGulp groups are Docs / Release / Git / Backup", async () => {
+test("µGulp groups are Firmware / Tools / Docs / Release / Git / Backup", async () => {
   const mod = await import("../../gulpfile.mjs");
   assert.ok(mod.µGroups?.groups);
   const keys = Object.keys(mod.µGroups.groups).map((k) =>
     k.replace(/<context="µGroup"\/>/g, "").trim()
   );
-  for (const need of ["Docs", "Release", "Git", "Backup"]) {
+  for (const need of ["Firmware", "Tools", "Docs", "Release", "Git", "Backup"]) {
     assert.ok(keys.includes(need), `missing group ${need}: ${keys.join(",")}`);
   }
   assert.equal(keys.includes("Docs & Quality"), false);
+  assert.equal(mod.BACKUP_NAS, undefined, "NAS alias must not be a dashboard export");
 
   const groupOf = (fn) =>
     String(fn["\u00b5Group"] ?? fn.µGroup ?? "").replace(/<context="µGroup"\/>/g, "");
+  assert.equal(groupOf(mod.build), "Firmware");
+  assert.equal(groupOf(mod.devices), "Tools");
   assert.equal(groupOf(mod.docs), "Docs");
   assert.equal(groupOf(mod.RELEASES_UPDATE), "Release");
-  assert.equal(groupOf(mod.RELEASES_HISTORY), "Release");
   assert.equal(groupOf(mod.BACKUP_GIT), "Git");
   assert.equal(groupOf(mod.backup), "Backup");
+
+  const nameOf = (fn) =>
+    typeof fn["\u00b5DisplayName"] === "function"
+      ? fn["\u00b5DisplayName"]()
+      : String(fn["\u00b5DisplayName"] ?? fn.µDisplayName ?? "");
+  assert.match(nameOf(mod.build), /V<version\/>/);
+  assert.match(nameOf(mod.BACKUP_GIT), /Publish Git checkpoint/i);
+  assert.doesNotMatch(nameOf(mod.BACKUP_GIT), /backup checkpoint/i);
+  assert.match(mod.µI18xContext.version, /^0\./);
+
+  const de = JSON.parse(
+    readFileSync(join(ROOT, "i18x/gulp/de-DE.json"), "utf8")
+  );
+  assert.equal(
+    de['Build Firmware V<version/><context="µDisplayName"/>'],
+    "Firmware bauen V<version/>"
+  );
+  assert.equal(
+    de['Publish Git checkpoint V<version/><context="µDisplayName"/>'],
+    "Git-Checkpoint veröffentlichen V<version/>"
+  );
+  assert.equal(de['Backup to NAS (alias)<context="µDisplayName"/>'], undefined);
 });
 
 test("canonical µGulp-ready asset exists once", () => {
@@ -248,5 +272,5 @@ test("git backup dry-run does not commit", async () => {
   });
   assert.equal(result.dryRun, true);
   assert.ok(result.reason === "dry-run" || result.reason === "not-a-repo");
-  assert.match(result.message, /^backup: BlueShift /);
+  assert.match(result.message, /^publish: BlueShift /);
 });

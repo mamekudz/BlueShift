@@ -691,21 +691,30 @@ BlueShift should use the established µGulp-compatible Gulp workflow.
 At minimum plan for:
 
     help
+    build / flash / upload / rebuild / clean / size
+    devices / monitor
     docs
     releases:update
     releases:history
     backup:git
-    backup:nas
+    backup
     backup:all
 
 µGulp groups (ESP][-aligned):
 
+    Firmware
+    Tools
     Docs
     Release
     Git
     Backup
 
-Do not collapse Docs + Release + Git into a single group.
+Git (`backup:git`) is **publication** (checkpoint + push), not backup.
+NAS (`backup`) is private backup. Do not show a duplicate “NAS alias” task in the dashboard.
+
+Task display names use en-US keys + `i18x/gulp/{en-US,de-DE}.json` and `V<version/>`
+(from `RELEASES.json` / `µI18xContext.version`). Regenerate dictionaries with
+`npm run i18x:gulp`.
 
 
 ## 83a. RELEASES.json

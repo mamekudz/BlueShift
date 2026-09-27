@@ -88,7 +88,7 @@ export function BackupCommitMessage(_date = new Date()) {
   const d = pad(_date.getDate());
   const hh = pad(_date.getHours());
   const mm = pad(_date.getMinutes());
-  return `backup: BlueShift ${y}-${m}-${d} ${hh}:${mm}`;
+  return `publish: BlueShift ${y}-${m}-${d} ${hh}:${mm}`;
 }
 
 /**
