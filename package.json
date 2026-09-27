@@ -14,6 +14,8 @@
     "format": "gulp format",
     "format:check": "gulp format:check",
     "check": "gulp check",
+    "releases:update": "gulp releases:update",
+    "releases:history": "gulp releases:history",
     "backup": "gulp backup",
     "backup:git": "gulp backup:git",
     "backup:nas": "gulp backup:nas",
@@ -23,8 +25,9 @@
     "test:audio": "node --test dev/tools/audio_pipeline.test.mjs",
     "test:protocol": "node --test dev/tools/protocol_v1_golden.test.mjs",
     "test:nas-policy": "node --test dev/tools/nas-policy.test.mjs",
+    "test:releases": "node --test dev/tools/releases.test.mjs",
     "test:host:native": "pio run -e native",
-    "test": "npm run test:infra && npm run test:host && npm run test:audio && npm run test:protocol && npm run test:nas-policy",
+    "test": "npm run test:infra && npm run test:host && npm run test:audio && npm run test:protocol && npm run test:nas-policy && npm run test:releases",
     "gulp:tasks": "gulp --tasks"
   },
   "microgulp": {

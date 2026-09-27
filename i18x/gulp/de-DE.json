@@ -1,0 +1,22 @@
+{
+	"Help<context=\"µDisplayName\"/>": "Hilfe",
+	"Compose README<context=\"µDisplayName\"/>": "README erzeugen",
+	"Format C/C++<context=\"µDisplayName\"/>": "C/C++ formatieren",
+	"Check C/C++ format<context=\"µDisplayName\"/>": "C/C++-Format prüfen",
+	"Project checks<context=\"µDisplayName\"/>": "Projektprüfungen",
+	"Git backup checkpoint<context=\"µDisplayName\"/>": "Git-Backup-Checkpoint",
+	"Backup to NAS<context=\"µDisplayName\"/>": "Backup auf NAS",
+	"Backup to NAS (alias)<context=\"µDisplayName\"/>": "Backup auf NAS (Alias)",
+	"Backup all (docs + Git + NAS)<context=\"µDisplayName\"/>": "Alles sichern (Docs + Git + NAS)",
+	"Release history up to date<context=\"µDisplayName\"/>": "Release-Historie aktuell",
+	"Update release history — <pending format=\"int\"/> pending<context=\"µDisplayName\"/>": "Release-Historie aktualisieren — <pending format=\"int\"/> ausstehend",
+	"Release history — <version/><context=\"µDisplayName\"/>": "Release-Historie — <version/>",
+	"Release history — <n format=\"int\"/> entries<context=\"µDisplayName\"/>": "Release-Historie — <n format=\"int\"/> Einträge",
+	"Docs & Quality<context=\"µGroup\"/>": "Docs & Qualität",
+	"Backup<context=\"µGroup\"/>": "Backup",
+	"Unmerged contributor release notes available.<context=\"µAttentionTooltip\"/>": "Nicht gemergte Contributor-Release-Notes verfügbar.",
+	"Lists BlueShift Gulp tasks. Safe default — no build, commit, or NAS.<context=\"µDescription\"/>": "Listet BlueShift-Gulp-Tasks. Sichere Standardaufgabe — kein Build, Commit oder NAS.",
+	"Generates README.md and README.de-DE.md from en-US/de-DE sources and injects the compatibility table from devices.json.<context=\"µDescription\"/>": "Erzeugt README.md und README.de-DE.md aus en-US/de-DE-Quellen und fügt die Kompatibilitätstabelle aus devices.json ein.",
+	"Merges fresh contributor notes from dev/releases/*.json into RELEASES.json (30-day window, fingerprint duplicates, release-info context tags).<context=\"µDescription\"/>": "Mergt frische Contributor-Notizen aus dev/releases/*.json nach RELEASES.json (30-Tage-Fenster, Fingerprint-Duplikate, release-info-Kontext-Tags).",
+	"Shows localized BlueShift release history from RELEASES.json (date, version, info lines). Does not dump raw JSON.<context=\"µDescription\"/>": "Zeigt lokalisierte BlueShift-Release-Historie aus RELEASES.json (Datum, Version, Infozeilen). Kein Roh-JSON-Dump."
+}

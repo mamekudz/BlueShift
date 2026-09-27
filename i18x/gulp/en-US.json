@@ -1,0 +1,18 @@
+{
+	"Help<context=\"µDisplayName\"/>": "Help<context=\"µDisplayName\"/>",
+	"Compose README<context=\"µDisplayName\"/>": "Compose README<context=\"µDisplayName\"/>",
+	"Format C/C++<context=\"µDisplayName\"/>": "Format C/C++<context=\"µDisplayName\"/>",
+	"Check C/C++ format<context=\"µDisplayName\"/>": "Check C/C++ format<context=\"µDisplayName\"/>",
+	"Project checks<context=\"µDisplayName\"/>": "Project checks<context=\"µDisplayName\"/>",
+	"Git backup checkpoint<context=\"µDisplayName\"/>": "Git backup checkpoint<context=\"µDisplayName\"/>",
+	"Backup to NAS<context=\"µDisplayName\"/>": "Backup to NAS<context=\"µDisplayName\"/>",
+	"Backup to NAS (alias)<context=\"µDisplayName\"/>": "Backup to NAS (alias)<context=\"µDisplayName\"/>",
+	"Backup all (docs + Git + NAS)<context=\"µDisplayName\"/>": "Backup all (docs + Git + NAS)<context=\"µDisplayName\"/>",
+	"Release history up to date<context=\"µDisplayName\"/>": "Release history up to date<context=\"µDisplayName\"/>",
+	"Update release history — <pending format=\"int\"/> pending<context=\"µDisplayName\"/>": "Update release history — <pending format=\"int\"/> pending<context=\"µDisplayName\"/>",
+	"Release history — <version/><context=\"µDisplayName\"/>": "Release history — <version/><context=\"µDisplayName\"/>",
+	"Release history — <n format=\"int\"/> entries<context=\"µDisplayName\"/>": "Release history — <n format=\"int\"/> entries<context=\"µDisplayName\"/>",
+	"Docs & Quality<context=\"µGroup\"/>": "Docs & Quality<context=\"µGroup\"/>",
+	"Backup<context=\"µGroup\"/>": "Backup<context=\"µGroup\"/>",
+	"Unmerged contributor release notes available.<context=\"µAttentionTooltip\"/>": "Unmerged contributor release notes available.<context=\"µAttentionTooltip\"/>"
+}

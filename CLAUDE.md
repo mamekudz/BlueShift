@@ -692,9 +692,29 @@ At minimum plan for:
 
     help
     docs
+    releases:update
+    releases:history
     backup:git
     backup:nas
     backup:all
+
+
+## 83a. RELEASES.json
+
+Root `RELEASES.json` is the canonical consolidated BlueShift project history.
+
+Contributor notes live in `dev/releases/*.json` (en-US authoring).
+
+`releases:update` merges contributor entries that are:
+
+- newer than 30 days, and
+- not already present (fingerprint = version + stripped info text)
+
+Tooling owns `<context="release info"/>` normalization.
+
+`releases:history` shows localized readable history — not a raw JSON dump.
+
+Details: `docs/releases/README.md`.
 
 
 ## 84. Git Backup

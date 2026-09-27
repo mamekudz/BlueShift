@@ -69,6 +69,9 @@ test("0 NAS targets from empty config", () => {
 test("CLAUDE.md is in Git ensure + NAS include lists", () => {
   assert.ok(GIT_BACKUP_ENSURE_PATHS.includes("CLAUDE.md"));
   assert.ok(NAS_BACKUP_INCLUDE_FILES.includes("CLAUDE.md"));
+  assert.ok(NAS_BACKUP_INCLUDE_FILES.includes("RELEASES.json"));
+  assert.ok(GIT_BACKUP_ENSURE_PATHS.includes("RELEASES.json"));
+  assert.ok(GIT_BACKUP_ENSURE_PATHS.includes("i18x"));
   assert.ok(existsSync(join(ROOT, "CLAUDE.md")));
   assert.ok(GIT_BACKUP_NEVER_STAGE.includes("config/nas.targets.local"));
 });

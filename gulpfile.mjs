@@ -3,7 +3,7 @@
 // © 2026 Meinolf Amekudzi
 //
 // Groups:
-//   Docs & Quality — help / docs / format / check
+//   Docs & Quality — help / docs / format / check / releases:*
 //   Backup         — backup:git / backup / backup:nas / backup:all
 //
 // NAS form = microGulp BACKUP_TO_NAS / Watchy / esp2 pattern (destination1..3).
@@ -24,6 +24,10 @@ import {
   GetParameter,
   RequestForm,
   IsMicroGulp,
+  LogAccordion,
+  NotifyTasksChanged,
+  SetTaskEmphasis,
+  GetLid,
 } from "gulp-mu-gulp-api";
 import { ComposeReadme, README_SOURCE_RELATIVE } from "./dev/tools/readme-compose.mjs";
 import {
@@ -38,6 +42,14 @@ import {
 } from "./dev/tools/nas-backup.mjs";
 import { RunGitBackup } from "./dev/tools/git-backup.mjs";
 import { RunClangFormat } from "./dev/tools/format.mjs";
+import { ReleasesPaths } from "./dev/tools/releases/paths.mjs";
+import {
+  CountPendingContributorMerges,
+  MergeDeveloperReleases,
+} from "./dev/tools/releases/release-merge.mjs";
+import {
+  BuildReleaseHistoryAccordion,
+} from "./dev/tools/releases/release-history.mjs";
 
 InstallStringExtensions();
 
@@ -51,9 +63,21 @@ const rootDir = dirname(fileURLToPath(import.meta.url));
  */
 function _Tag(_task, _meta) {
   if (_meta.gulpName) _task.displayName = _meta.gulpName;
-  if (_meta.µDisplayName) _task.µDisplayName = _meta.µDisplayName.i18xRegister();
-  if (_meta.µDescription) _task.µDescription = _meta.µDescription.i18xRegister();
-  if (_meta.µTooltip) _task.µTooltip = _meta.µTooltip.i18xRegister();
+  if (typeof _meta.µDisplayName === "function") {
+    _task.µDisplayName = _meta.µDisplayName;
+  } else if (_meta.µDisplayName) {
+    _task.µDisplayName = _meta.µDisplayName.i18xRegister();
+  }
+  if (typeof _meta.µDescription === "function") {
+    _task.µDescription = _meta.µDescription;
+  } else if (_meta.µDescription) {
+    _task.µDescription = _meta.µDescription.i18xRegister();
+  }
+  if (typeof _meta.µTooltip === "function") {
+    _task.µTooltip = _meta.µTooltip;
+  } else if (_meta.µTooltip) {
+    _task.µTooltip = _meta.µTooltip.i18xRegister();
+  }
   if (_meta.µGroup) _task.µGroup = _meta.µGroup.i18xRegister();
   if (_meta.µIcon != null) _task.µIcon = _meta.µIcon;
   if (_meta.µOrder != null) _task.µOrder = _meta.µOrder;
@@ -64,7 +88,52 @@ function _Tag(_task, _meta) {
     _task.µExecutionRestrictions = _meta.µExecutionRestrictions;
   }
   if (_meta.µParameters) _task.µParameters = _meta.µParameters;
+  if (_meta.µAttention != null) _task.µAttention = _meta.µAttention;
+  if (_meta.µAttentionTooltip != null) {
+    _task.µAttentionTooltip =
+      typeof _meta.µAttentionTooltip === "function"
+        ? _meta.µAttentionTooltip
+        : _meta.µAttentionTooltip.i18xRegister();
+  }
+  if (_meta.µAttentionWatch != null) {
+    _task.µAttentionWatch = _meta.µAttentionWatch;
+  }
   return _task;
+}
+
+function _ReleaseMergeOptions() {
+  const paths = ReleasesPaths(rootDir);
+  return {
+    developerDir: paths.developerDir,
+    releasesPath: paths.releasesPath,
+    maxAgeDays: 30,
+  };
+}
+
+function _PendingReleaseMerges() {
+  return CountPendingContributorMerges(_ReleaseMergeOptions());
+}
+
+function _ReleasesUpdateDisplayName() {
+  const pending = _PendingReleaseMerges();
+  if (pending <= 0) {
+    return 'Release history up to date<context="µDisplayName"/>'.i18xRegister();
+  }
+  return `Update release history — ${pending} pending<context="µDisplayName"/>`.i18xRegister();
+}
+
+function _ReleasesHistoryDisplayName() {
+  const paths = ReleasesPaths(rootDir);
+  const accordion = BuildReleaseHistoryAccordion({
+    releasesPath: paths.releasesPath,
+    root: rootDir,
+    lid: "en-US",
+    maxReleases: 1,
+  });
+  if (!accordion.items.length) {
+    return 'Release history — 0 entries<context="µDisplayName"/>'.i18xRegister();
+  }
+  return `Release history — ${accordion.versionLabel}<context="µDisplayName"/>`.i18xRegister();
 }
 
 //================================================================
@@ -77,6 +146,8 @@ const TASK_HELP = [
   ["format", "Run clang-format -i on project C/C++ sources"],
   ["format:check", "Check clang-format without writing"],
   ["check", "format:check + optional pio check (if PlatformIO available)"],
+  ["releases:update", "Merge dev/releases/*.json → RELEASES.json (30-day, idempotent)"],
+  ["releases:history", "Show localized release history from RELEASES.json"],
   ["backup:git", "Explicit Git checkpoint (shows staged files; never force)"],
   ["backup / backup:nas", "NAS backup to 0–3 destinations"],
   ["backup:all", "docs → backup:git → backup (NAS)"],
@@ -269,6 +340,99 @@ _Tag(check, {
   µIcon: "\u1F50D",
   µOrder: 30,
   µExecutionConcurrency: false,
+});
+
+//================================================================
+// Release history (RELEASES.json)
+//================================================================
+
+export async function RELEASES_UPDATE() {
+  ReportProgress(0, "releases-update");
+  Log(
+    'Merging contributor notes (dev/releases/*.json) into RELEASES.json…<context="task log"/>'
+  );
+  const summary = MergeDeveloperReleases({
+    ..._ReleaseMergeOptions(),
+    write: true,
+  });
+  Log(
+    'scanned=<scanned format="int"/> new=<merged format="int"/> duplicates=<duplicates format="int"/> expired=<expired format="int"/> invalid=<invalid format="int"/><context="task log"/>',
+    {
+      scanned: summary.scanned,
+      merged: summary.merged,
+      duplicates: summary.duplicates,
+      expired: summary.expired,
+      invalid: summary.invalid,
+    }
+  );
+  if (summary.authors.length) {
+    Log('authors: <authors/><context="task log"/>', {
+      authors: summary.authors.join(", "),
+    });
+  }
+  SetTaskEmphasis("RELEASES_UPDATE", null);
+  NotifyTasksChanged();
+  ReportProgress(1, "releases-update");
+  PlaySignal("success");
+  return summary;
+}
+_Tag(RELEASES_UPDATE, {
+  gulpName: "releases:update",
+  µDisplayName: () => _ReleasesUpdateDisplayName(),
+  µDescription:
+    'Merges fresh contributor notes from dev/releases/*.json into RELEASES.json (30-day window, fingerprint duplicates, release-info context tags).<context="µDescription"/>',
+  µTooltip:
+    'ACTION_AVAILABLE when unmerged contributor notes exist — not a build failure. Safe to re-run (idempotent).<context="µTooltip"/>',
+  µGroup: 'Docs & Quality<context="µGroup"/>',
+  µIcon: "\uE915",
+  µOrder: 40,
+  µExecutionConcurrency: false,
+  µAttention: () => _PendingReleaseMerges() > 0,
+  µAttentionTooltip:
+    'Unmerged contributor release notes available.<context="µAttentionTooltip"/>',
+  µAttentionWatch: {
+    files: ["RELEASES.json", "dev/releases"],
+    intervalMs: 10_000,
+  },
+});
+
+export async function RELEASES_HISTORY() {
+  ReportProgress(0, "releases-history");
+  const paths = ReleasesPaths(rootDir);
+  let lid = "en-US";
+  try {
+    const active = typeof GetLid === "function" ? GetLid() : null;
+    if (active === "de-DE" || active === "en-US") lid = active;
+  } catch {
+    /* CLI without i18xe */
+  }
+  const accordion = BuildReleaseHistoryAccordion({
+    releasesPath: paths.releasesPath,
+    root: rootDir,
+    lid,
+    maxReleases: 12,
+  });
+  Log(
+    'Release history: <count format="int"/> version block(s), <entries format="int"/> info line(s).<context="task log"/>',
+    { count: accordion.items.length, entries: accordion.entryCount }
+  );
+  // LogAccordion renders a dashboard accordion under µGulp and ASCII on CLI.
+  LogAccordion(accordion);
+  ReportProgress(1, "releases-history");
+  PlaySignal("success");
+  return accordion;
+}
+_Tag(RELEASES_HISTORY, {
+  gulpName: "releases:history",
+  µDisplayName: () => _ReleasesHistoryDisplayName(),
+  µDescription:
+    'Shows localized BlueShift release history from RELEASES.json (date, version, info lines). Does not dump raw JSON.<context="µDescription"/>',
+  µTooltip:
+    'Read-only history view. Translations: i18x/gulp/releases/{en-US,de-DE}.json.<context="µTooltip"/>',
+  µGroup: 'Docs & Quality<context="µGroup"/>',
+  µIcon: "\uE914",
+  µOrder: 41,
+  µExecutionConcurrency: true,
 });
 
 //================================================================
@@ -555,6 +719,8 @@ export default help;
 gulp.task("default", help);
 gulp.task("help", help);
 gulp.task("format:check", FORMAT_CHECK);
+gulp.task("releases:update", RELEASES_UPDATE);
+gulp.task("releases:history", RELEASES_HISTORY);
 gulp.task("backup:git", BACKUP_GIT);
 gulp.task("backup:nas", BACKUP_NAS);
 gulp.task("backup:all", BACKUP_ALL);

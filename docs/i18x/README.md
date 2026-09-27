@@ -10,6 +10,14 @@ Firmware UI localization is prepared from milestone 1.
 Reuse the project-family **i18x** concepts (`i18xe` / µGulp i18x) where practical.
 Do not build a second incompatible localization system.
 
+## µGulp task dictionaries
+
+| Path | Role |
+| --- | --- |
+| `i18x/gulp/en-US.json` | Task metadata source phrases |
+| `i18x/gulp/de-DE.json` | German task UI strings |
+| `i18x/gulp/releases/*.json` | Release-info line translations for `releases:history` |
+
 Embedded constraints:
 
 - Prefer immutable flash string tables
@@ -18,3 +26,5 @@ Embedded constraints:
 
 Implementation stub: `components/i18n/`.
 OLED strings in later milestones **must** call through that layer.
+
+Release history workflow: `docs/releases/README.md`.
