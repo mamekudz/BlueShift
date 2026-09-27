@@ -12,7 +12,9 @@
 	"Update release history — <pending format=\"int\"/> pending<context=\"µDisplayName\"/>": "Update release history — <pending format=\"int\"/> pending<context=\"µDisplayName\"/>",
 	"Release history — <version/><context=\"µDisplayName\"/>": "Release history — <version/><context=\"µDisplayName\"/>",
 	"Release history — <n format=\"int\"/> entries<context=\"µDisplayName\"/>": "Release history — <n format=\"int\"/> entries<context=\"µDisplayName\"/>",
-	"Docs & Quality<context=\"µGroup\"/>": "Docs & Quality<context=\"µGroup\"/>",
+	"Docs<context=\"µGroup\"/>": "Docs<context=\"µGroup\"/>",
+	"Release<context=\"µGroup\"/>": "Release<context=\"µGroup\"/>",
+	"Git<context=\"µGroup\"/>": "Git<context=\"µGroup\"/>",
 	"Backup<context=\"µGroup\"/>": "Backup<context=\"µGroup\"/>",
 	"Unmerged contributor release notes available.<context=\"µAttentionTooltip\"/>": "Unmerged contributor release notes available.<context=\"µAttentionTooltip\"/>"
 }

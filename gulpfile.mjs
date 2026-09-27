@@ -2,9 +2,11 @@
 // BlueShift — µGulp / Gulp task runner
 // © 2026 Meinolf Amekudzi
 //
-// Groups:
-//   Docs & Quality — help / docs / format / check / releases:*
-//   Backup         — backup:git / backup / backup:nas / backup:all
+// Groups (family-aligned with ESP][):
+//   Docs    — help / docs / format / format:check / check
+//   Release — releases:update / releases:history
+//   Git     — backup:git
+//   Backup  — backup / backup:nas / backup:all
 //
 // NAS form = microGulp BACKUP_TO_NAS / Watchy / esp2 pattern (destination1..3).
 // Default = help (safe — never builds firmware, commits, or touches NAS).
@@ -54,6 +56,17 @@ import {
 InstallStringExtensions();
 
 export const µI18xContext = { project: "blueshift", product: "BlueShift" };
+
+/** Dashboard start layout for µGroup sections (ESP][-aligned names). */
+export const µGroups = {
+  collapsed: false,
+  groups: {
+    'Docs<context="µGroup"/>': "open",
+    'Release<context="µGroup"/>': "open",
+    'Git<context="µGroup"/>': "open",
+    'Backup<context="µGroup"/>': "open",
+  },
+};
 
 const rootDir = dirname(fileURLToPath(import.meta.url));
 
@@ -167,14 +180,14 @@ _Tag(help, {
   µDisplayName: 'Help<context="µDisplayName"/>',
   µDescription:
     'Lists BlueShift Gulp tasks. Safe default — no build, commit, or NAS.<context="µDescription"/>',
-  µGroup: 'Docs & Quality<context="µGroup"/>',
+  µGroup: 'Docs<context="µGroup"/>',
   µIcon: "\u2753",
   µOrder: 1,
   µExecutionConcurrency: true,
 });
 
 //================================================================
-// Docs & Quality
+// Docs
 //================================================================
 
 export async function docs() {
@@ -205,7 +218,7 @@ _Tag(docs, {
   µDisplayName: 'Compose README<context="µDisplayName"/>',
   µDescription:
     'Generates README.md and README.de-DE.md from en-US/de-DE sources and injects the compatibility table from devices.json.<context="µDescription"/>',
-  µGroup: 'Docs & Quality<context="µGroup"/>',
+  µGroup: 'Docs<context="µGroup"/>',
   µIcon: "\uE915",
   µOrder: 10,
   µExecutionConcurrency: false,
@@ -232,7 +245,7 @@ _Tag(format, {
   µDisplayName: 'Format C/C++<context="µDisplayName"/>',
   µDescription:
     'Runs clang-format -i on src/, include/, components/, test/. Requires clang-format on PATH or CLANG_FORMAT.<context="µDescription"/>',
-  µGroup: 'Docs & Quality<context="µGroup"/>',
+  µGroup: 'Docs<context="µGroup"/>',
   µIcon: "\u2728",
   µOrder: 20,
   µExecutionConcurrency: false,
@@ -254,7 +267,7 @@ _Tag(FORMAT_CHECK, {
   µDisplayName: 'Check C/C++ format<context="µDisplayName"/>',
   µDescription:
     'clang-format --dry-run --Werror on project sources. Soft-skips if clang-format is missing.<context="µDescription"/>',
-  µGroup: 'Docs & Quality<context="µGroup"/>',
+  µGroup: 'Docs<context="µGroup"/>',
   µIcon: "\u2714",
   µOrder: 21,
   µExecutionConcurrency: false,
@@ -336,7 +349,7 @@ _Tag(check, {
   µDisplayName: 'Project checks<context="µDisplayName"/>',
   µDescription:
     'format:check plus optional PlatformIO cppcheck when available. Does not flash hardware.<context="µDescription"/>',
-  µGroup: 'Docs & Quality<context="µGroup"/>',
+  µGroup: 'Docs<context="µGroup"/>',
   µIcon: "\u1F50D",
   µOrder: 30,
   µExecutionConcurrency: false,
@@ -383,9 +396,9 @@ _Tag(RELEASES_UPDATE, {
     'Merges fresh contributor notes from dev/releases/*.json into RELEASES.json (30-day window, fingerprint duplicates, release-info context tags).<context="µDescription"/>',
   µTooltip:
     'ACTION_AVAILABLE when unmerged contributor notes exist — not a build failure. Safe to re-run (idempotent).<context="µTooltip"/>',
-  µGroup: 'Docs & Quality<context="µGroup"/>',
+  µGroup: 'Release<context="µGroup"/>',
   µIcon: "\uE915",
-  µOrder: 40,
+  µOrder: 10,
   µExecutionConcurrency: false,
   µAttention: () => _PendingReleaseMerges() > 0,
   µAttentionTooltip:
@@ -429,9 +442,9 @@ _Tag(RELEASES_HISTORY, {
     'Shows localized BlueShift release history from RELEASES.json (date, version, info lines). Does not dump raw JSON.<context="µDescription"/>',
   µTooltip:
     'Read-only history view. Translations: i18x/gulp/releases/{en-US,de-DE}.json.<context="µTooltip"/>',
-  µGroup: 'Docs & Quality<context="µGroup"/>',
+  µGroup: 'Release<context="µGroup"/>',
   µIcon: "\uE914",
-  µOrder: 41,
+  µOrder: 11,
   µExecutionConcurrency: true,
 });
 
@@ -653,9 +666,9 @@ _Tag(BACKUP_GIT, {
   µDisplayName: 'Git backup checkpoint<context="µDisplayName"/>',
   µDescription:
     'Checkpoint commit including CLAUDE.md. Shows staged files first. Pushes when a remote exists. Never force-pushes or hard-resets.<context="µDescription"/>',
-  µGroup: 'Backup<context="µGroup"/>',
+  µGroup: 'Git<context="µGroup"/>',
   µIcon: "\uE902",
-  µOrder: 20,
+  µOrder: 10,
   µExecutionConcurrency: false,
 });
 

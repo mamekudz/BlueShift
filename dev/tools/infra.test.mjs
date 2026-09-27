@@ -103,6 +103,26 @@ test("readme filter strips note/website and is deterministic", () => {
   assert.doesNotMatch(a, /drop/);
 });
 
+test("µGulp groups are Docs / Release / Git / Backup", async () => {
+  const mod = await import("../../gulpfile.mjs");
+  assert.ok(mod.µGroups?.groups);
+  const keys = Object.keys(mod.µGroups.groups).map((k) =>
+    k.replace(/<context="µGroup"\/>/g, "").trim()
+  );
+  for (const need of ["Docs", "Release", "Git", "Backup"]) {
+    assert.ok(keys.includes(need), `missing group ${need}: ${keys.join(",")}`);
+  }
+  assert.equal(keys.includes("Docs & Quality"), false);
+
+  const groupOf = (fn) =>
+    String(fn["\u00b5Group"] ?? fn.µGroup ?? "").replace(/<context="µGroup"\/>/g, "");
+  assert.equal(groupOf(mod.docs), "Docs");
+  assert.equal(groupOf(mod.RELEASES_UPDATE), "Release");
+  assert.equal(groupOf(mod.RELEASES_HISTORY), "Release");
+  assert.equal(groupOf(mod.BACKUP_GIT), "Git");
+  assert.equal(groupOf(mod.backup), "Backup");
+});
+
 test("canonical µGulp-ready asset exists once", () => {
   assert.equal(MICROGULP_READY_ASSET, "docs/assets/microgulp-ready.png");
   assert.ok(existsSync(join(ROOT, MICROGULP_READY_ASSET)));

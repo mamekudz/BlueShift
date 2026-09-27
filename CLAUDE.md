@@ -698,6 +698,15 @@ At minimum plan for:
     backup:nas
     backup:all
 
+µGulp groups (ESP][-aligned):
+
+    Docs
+    Release
+    Git
+    Backup
+
+Do not collapse Docs + Release + Git into a single group.
+
 
 ## 83a. RELEASES.json
 
