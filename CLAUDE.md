@@ -860,3 +860,17 @@ Do not require ESP][ to send pre-rendered PCM.
 Unknown or future frame types must be rejected as malformed and dropped.
 
 Do not crash; do not invent speaker edges for gaps.
+
+
+# MECHANICAL / 3D PRINT
+
+
+## 97. Enclosure Specification Authority
+
+`3dprint/ENCLOSURE-SPEC.md` is the authoritative detailed mechanical
+specification for the BlueShift™ enclosure foundation.
+
+Do not copy the complete enclosure spec into CLAUDE.md.
+
+Agents prepare dimensions, keep-outs, BOM, and Plasticity-ready reference
+material only. Do **not** auto-generate a finished enclosure.

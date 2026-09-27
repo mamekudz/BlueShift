@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "id": "blueshift-t-lion-wiring",
+  "note": "Electrical relationships for enclosure/power planning. No invented GPIOs.",
+  "powerPath": {
+    "status": "DOCUMENTED",
+    "stages": [
+      { "id": "usb", "ref": "J1 Micro-USB", "role": "5V VBUS input" },
+      { "id": "charger", "ref": "U27 TP5400", "role": "charge + path to BAT/system" },
+      { "id": "battery", "ref": "P3 18650", "role": "cell" },
+      { "id": "batSwitch", "ref": "JP1 SK-12D02", "role": "BAT disconnect" },
+      { "id": "buck", "ref": "U2 SY8089", "role": "3V3 rail" },
+      { "id": "load", "ref": "ESP32-WROVER / OLED / logic", "role": "system" }
+    ],
+    "warnings": [
+      "TP5400 charger function is not assumed to be a complete BMS",
+      "Prefer protected 18650 until board protection PHYSICALLY_VERIFIED"
+    ]
+  },
+  "signals": {
+    "oled": {
+      "sda": { "gpio": 21, "status": "DOCUMENTED" },
+      "scl": { "gpio": 22, "status": "DOCUMENTED" },
+      "address": { "value": "0x3C", "status": "DOCUMENTED" }
+    },
+    "fiveWay": {
+      "up": { "gpio": 32, "status": "DOCUMENTED" },
+      "down": { "gpio": 33, "status": "DOCUMENTED" },
+      "ok": { "gpio": 34, "status": "DOCUMENTED" },
+      "left": { "gpio": 36, "status": "DOCUMENTED" },
+      "right": { "gpio": 39, "status": "DOCUMENTED" }
+    },
+    "batteryAdc": {
+      "gpio": 35,
+      "dividerRatio": 2.0,
+      "status": "DOCUMENTED"
+    },
+    "statusLed": {
+      "gpio": 5,
+      "status": "ASSUMED"
+    },
+    "chargeStatusToMcu": {
+      "status": "UNKNOWN"
+    }
+  },
+  "externalEnclosureSwitch": {
+    "id": "PWR-01B",
+    "status": "UNASSIGNED",
+    "seriesInterruptPoint": { "status": "UNASSIGNED" }
+  }
+}

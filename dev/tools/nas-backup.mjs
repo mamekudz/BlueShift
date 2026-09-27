@@ -26,6 +26,7 @@ export const NAS_BACKUP_INCLUDE_DIRS = Object.freeze([
   "dev",
   "config",
   "test",
+  "3dprint",
   ".git",
 ]);
 

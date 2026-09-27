@@ -26,6 +26,7 @@ export const GIT_BACKUP_ENSURE_PATHS = Object.freeze([
   "docs",
   "dev",
   "test",
+  "3dprint",
   "config/nas.targets.example",
 ]);
 

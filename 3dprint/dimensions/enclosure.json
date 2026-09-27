@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "id": "blueshift-enclosure-candidates",
+  "note": "No finished enclosure. Cutouts are PROVISIONAL_CAD_CANDIDATE until physical measure.",
+  "designIntent": {
+    "openingsRequired": ["oled", "fiveWay", "usb", "onOffAccess"],
+    "aesthetic": "simple manual Plasticity shell (µPhotoFrame-style)",
+    "generateFinishedEnclosure": false
+  },
+  "coordinateSystemRef": "dimensions/board.json",
+  "split": {
+    "recommendation": {
+      "upper": "PRINT-01 — OLED + 5-way (+ optional switch window)",
+      "lower": "PRINT-02 — USB + battery retention + board seat"
+    },
+    "status": "PROVISIONAL",
+    "final": false
+  },
+  "cutouts": {
+    "oled": {
+      "status": "PROVISIONAL_CAD_CANDIDATE",
+      "basis": "typical 0.96in active area + margin; hide module bezel",
+      "openingMm": { "w": 22.5, "h": 11.7 },
+      "marginMmPerSide": { "min": 0.4, "max": 0.8 },
+      "doNotEquateTo": ["full module outline", "PCB edge"]
+    },
+    "fiveWay": {
+      "status": "PROVISIONAL_CAD_CANDIDATE",
+      "mode": "DIRECT_ACCESS",
+      "openingMm": { "status": "UNKNOWN", "note": "Size after measuring actuator" },
+      "clearance": "Must not bind diagonal/edge travel",
+      "printedCap": { "id": "PRINT-03", "status": "CANDIDATE" }
+    },
+    "usb": {
+      "status": "PROVISIONAL_CAD_CANDIDATE",
+      "openingMm": { "w": 12.0, "h": 8.0 },
+      "note": "Plug envelope estimate; refine after measuring J1 position"
+    },
+    "onOff": {
+      "boardBatSwitchAccess": {
+        "ref": "PWR-01A / JP1 SK-12D02",
+        "status": "PROVISIONAL_CAD_CANDIDATE",
+        "openingMm": { "status": "UNKNOWN", "note": "Measure slider travel on board" }
+      },
+      "externalSwitch": {
+        "ref": "PWR-01B",
+        "status": "PENDING_COMPONENT_SELECTION",
+        "openingMm": null
+      }
+    }
+  },
+  "keepOuts": {
+    "antenna": {
+      "status": "PROVISIONAL",
+      "avoidNearTip": ["battery", "metal screws", "metal inserts", "shield plates", "dense wiring"],
+      "suggestedClearanceMm": 15
+    },
+    "battery": {
+      "status": "DOCUMENTED",
+      "rules": [
+        "no screw intrusion into cell volume",
+        "no sharp pressure points",
+        "not a structural spacer",
+        "serviceable replacement"
+      ]
+    }
+  },
+  "fastening": {
+    "candidates": ["self-tapping plastic screws", "M2/M2.5 heat-set inserts", "light snap-fit"],
+    "status": "TO_BE_SELECTED",
+    "requirement": "serviceable for battery/board/switch"
+  },
+  "printing": {
+    "material": { "status": "TO_BE_SELECTED" },
+    "layerHeightMm": { "status": "TO_BE_SELECTED" },
+    "wallThicknessMm": { "status": "TO_BE_SELECTED" },
+    "toleranceMm": { "status": "TO_BE_SELECTED" },
+    "priorities": ["clean openings", "connector fit", "serviceability"]
+  }
+}

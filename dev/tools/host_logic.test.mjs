@@ -257,6 +257,39 @@ test("t-lion pins and board facade exist", () => {
   assert.match(board, /GPIO34\/36\/39/);
 });
 
+test("3dprint mechanical foundation present", () => {
+  const need = [
+    "3dprint/README.md",
+    "3dprint/ENCLOSURE-SPEC.md",
+    "3dprint/BOM.md",
+    "3dprint/WIRING.md",
+    "3dprint/SOURCES.md",
+    "3dprint/dimensions/board.json",
+    "3dprint/dimensions/enclosure.json",
+    "3dprint/dimensions/wiring.json",
+    "3dprint/plasticity/README.md",
+    "3dprint/cad/reference-bodies/t-lion-envelope.scad",
+  ];
+  for (const rel of need) {
+    assert.ok(existsSync(join(ROOT, rel)), rel);
+  }
+  const spec = readFileSync(join(ROOT, "3dprint/ENCLOSURE-SPEC.md"), "utf8");
+  assert.match(spec, /108\.51/);
+  assert.match(spec, /29\.01/);
+  assert.match(spec, /PROVISIONAL_CAD_CANDIDATE/);
+  assert.match(spec, /SK-12D02/);
+  assert.doesNotMatch(spec, /PHYSICALLY VERIFIED enclosure/i);
+  const board = JSON.parse(readFileSync(join(ROOT, "3dprint/dimensions/board.json"), "utf8"));
+  assert.equal(board.pcb.widthMm.value, 29.01);
+  assert.equal(board.pcb.lengthMm.value, 108.51);
+  assert.equal(board.officialCad.step, false);
+  assert.equal(board.fiveWay.gpios.up, 32);
+  const bom = readFileSync(join(ROOT, "3dprint/BOM.md"), "utf8");
+  assert.match(bom, /MAIN-01/);
+  assert.match(bom, /BAT-01/);
+  assert.match(bom, /TO_BE_SELECTED/);
+});
+
 test("M3 components present", () => {
   const need = [
     "components/display/ssd1306_display.cpp",

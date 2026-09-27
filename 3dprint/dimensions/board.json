@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "id": "blueshift-t-lion-board",
+  "statusNote": "Mechanical facts carry explicit status. Do not promote estimates to OFFICIAL.",
+  "product": {
+    "names": ["T-Lion", "T-Controller", "TTGO T18 V2.2 family"],
+    "marketingRevision": { "value": "V2.2", "status": "DOCUMENTED" },
+    "schematicFile": { "value": "t18_v2.3.pdf", "status": "DOCUMENTED" },
+    "schematicSheetTitles": { "value": ["power V1.0", "ESP32 V1.0"], "date": "2018-12-22", "status": "DOCUMENTED" },
+    "purchasedUnitRevision": { "value": null, "status": "UNKNOWN" },
+    "confidenceNote": "Marketing/repo V2.2 and schematic filename v2.3 are not silently equated."
+  },
+  "coordinateSystem": {
+    "plusX": "right (board width)",
+    "plusY": "toward OLED/antenna end (PROVISIONAL layout)",
+    "plusZ": "component side / OLED facing out",
+    "origin": "PCB outline bottom-left; Z=0 at PCB top surface",
+    "usbEnd": "-Y (PROVISIONAL)",
+    "antennaOledEnd": "+Y (PROVISIONAL)",
+    "status": "PROVISIONAL"
+  },
+  "pcb": {
+    "widthMm": { "value": 29.01, "axis": "X", "status": "DOCUMENTED", "source": "https://lilygo.cc/en-us/products/t-lion size" },
+    "lengthMm": { "value": 108.51, "axis": "Y", "status": "DOCUMENTED", "source": "https://lilygo.cc/en-us/products/t-lion size" },
+    "thicknessMm": { "value": 1.6, "status": "PROVISIONAL", "note": "Typical FR4; not on schematic" },
+    "totalStackHeightMm": { "value": null, "status": "UNKNOWN" },
+    "mountingHoles": { "status": "UNKNOWN", "note": "No public STEP/KiCad/Gerber found 2026-09-27" }
+  },
+  "mcu": {
+    "module": { "value": "ESP32-WROVER", "status": "DOCUMENTED" },
+    "antenna": {
+      "type": "on-module PCB antenna",
+      "boardRegion": "+Y / module end (PROVISIONAL)",
+      "keepOutMm": { "value": 15, "status": "PROVISIONAL", "note": "Avoid metal/battery overlap near tip where practical" }
+    }
+  },
+  "oled": {
+    "controller": { "value": "SSD1306", "status": "DOCUMENTED" },
+    "diagonalIn": { "value": 0.96, "status": "DOCUMENTED" },
+    "pixels": { "w": 128, "h": 64, "status": "DOCUMENTED" },
+    "i2c": { "sda": 21, "scl": 22, "address": "0x3C", "status": "DOCUMENTED" },
+    "moduleOutlineMm": { "w": 27.5, "h": 27.5, "status": "DERIVED", "note": "Typical 0.96 module; measure on board" },
+    "activeAreaMm": { "w": 21.7, "h": 10.9, "status": "DERIVED", "note": "Typical AA; measure on board" },
+    "boardRegion": { "value": "+Y end", "status": "PROVISIONAL" }
+  },
+  "fiveWay": {
+    "refdes": "U28",
+    "gpios": { "up": 32, "down": 33, "ok": 34, "left": 36, "right": 39, "status": "DOCUMENTED" },
+    "centerXyMm": { "status": "UNKNOWN" },
+    "actuatorHeightMm": { "status": "UNKNOWN" },
+    "clearancePolicy": "Allow U/D/L/R + press without binding",
+    "accessVariants": ["DIRECT_ACCESS", "PRINTED_CAP"],
+    "recommendedFirstPrototype": "DIRECT_ACCESS"
+  },
+  "usb": {
+    "connector": { "value": "Micro-USB", "refdes": "J1", "status": "DOCUMENTED" },
+    "uartIcSchematic": { "value": "CP2104", "status": "DOCUMENTED" },
+    "uartIcMarketing": { "value": "CH9102", "status": "DOCUMENTED", "conflict": true },
+    "shellXyMm": { "status": "UNKNOWN" },
+    "plugClearanceNote": "Opening must fit cable plug, not only shell"
+  },
+  "battery": {
+    "holder": { "refdes": "P3", "form": "18650", "status": "DOCUMENTED" },
+    "cell": { "status": "TO_BE_SELECTED", "preferProtected": true },
+    "batSwitch": { "refdes": "JP1", "model": "SK-12D02", "status": "DOCUMENTED" }
+  },
+  "charger": {
+    "ic": { "value": "TP5400", "refdes": "U27", "status": "DOCUMENTED" },
+    "equalsFullBms": false,
+    "warning": "Do not assume charger == complete battery protection"
+  },
+  "officialCad": {
+    "step": false,
+    "parasolid": false,
+    "kicad": false,
+    "gerber": false,
+    "checked": "2026-09-27"
+  }
+}
