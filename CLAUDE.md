@@ -719,6 +719,10 @@ No NAS destination may be hard-coded into the repository.
 
 One unavailable NAS must not prevent backup to another configured target.
 
+NAS backup uses an **explicit** include/exclude policy (not `.gitignore` alone).
+Valuable gitignored local/reference assets are normally NAS-backed.
+See §98 and `docs/backup/nas-policy.md`.
+
 
 # DOCUMENTATION
 
@@ -874,3 +878,21 @@ Do not copy the complete enclosure spec into CLAUDE.md.
 
 Agents prepare dimensions, keep-outs, BOM, and Plasticity-ready reference
 material only. Do **not** auto-generate a finished enclosure.
+
+
+# BACKUP
+
+
+## 98. Git vs NAS vs Redistribution
+
+`GIT_TRACKED`, `NAS_BACKED_UP`, and `REDISTRIBUTABLE` are **three independent**
+properties.
+
+Do not use `.gitignore` as the NAS backup policy.
+
+Valuable local / downloaded / reference assets should normally be preserved by
+**private NAS backup** even when they must not enter Git.
+
+Private NAS backup does not grant redistribution rights.
+
+Details: `docs/backup/nas-policy.md`.

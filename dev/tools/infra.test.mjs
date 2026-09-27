@@ -9,6 +9,7 @@ import { tmpdir } from "node:os";
 import {
   NAS_BACKUP_INCLUDE_FILES,
   NAS_BACKUP_EXCLUDE_DIRS,
+  NAS_BACKUP_INCLUDE_DIRS,
   NAS_BACKUP_MAX_DESTINATIONS,
   UniqueNasTargets,
   ResolveNasTargets,
@@ -75,6 +76,9 @@ test("CLAUDE.md is in Git ensure + NAS include lists", () => {
 test("NAS excludes regenerable trees", () => {
   assert.ok(NAS_BACKUP_EXCLUDE_DIRS.includes("node_modules"));
   assert.ok(NAS_BACKUP_EXCLUDE_DIRS.includes(".pio"));
+  assert.equal(NAS_BACKUP_EXCLUDE_DIRS.includes("_refs"), false);
+  assert.ok(NAS_BACKUP_INCLUDE_DIRS.includes("_refs"));
+  assert.ok(NAS_BACKUP_INCLUDE_DIRS.includes("3dprint"));
 });
 
 test("checkpoint message format", () => {
@@ -164,10 +168,14 @@ test("NAS mirror includes CLAUDE.md and skips .pio/node_modules", async () => {
     assert.ok(existsSync(join(dest, "docs", "compatibility", "devices.json")));
     assert.ok(existsSync(join(dest, "dev", "docs", "readme", "en-US.src.md")));
     assert.ok(existsSync(join(dest, "dev", "docs", "readme", "de-DE.src.md")));
+    assert.ok(existsSync(join(dest, "3dprint", "ENCLOSURE-SPEC.md")));
     assert.equal(existsSync(join(dest, "node_modules")), false);
     assert.equal(existsSync(join(dest, ".pio")), false);
     const check = VerifyBackupContents(dest);
     assert.equal(check.ok, true, check.missing.join(","));
+    assert.ok(existsSync(join(dest, "BACKUP_MANIFEST.json")));
+    const man = JSON.parse(readFileSync(join(dest, "BACKUP_MANIFEST.json"), "utf8"));
+    assert.equal(man.policy.gitignoreIsNotNasPolicy, true);
     assert.equal(existsSync(missingTarget), false);
   } finally {
     rmSync(dest, { recursive: true, force: true });

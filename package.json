@@ -22,8 +22,9 @@
     "test:host": "node --test dev/tools/host_logic.test.mjs",
     "test:audio": "node --test dev/tools/audio_pipeline.test.mjs",
     "test:protocol": "node --test dev/tools/protocol_v1_golden.test.mjs",
+    "test:nas-policy": "node --test dev/tools/nas-policy.test.mjs",
     "test:host:native": "pio run -e native",
-    "test": "npm run test:infra && npm run test:host && npm run test:audio && npm run test:protocol",
+    "test": "npm run test:infra && npm run test:host && npm run test:audio && npm run test:protocol && npm run test:nas-policy",
     "gulp:tasks": "gulp --tasks"
   },
   "microgulp": {

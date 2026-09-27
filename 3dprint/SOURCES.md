@@ -59,3 +59,10 @@ Reference geometry is **project-authored** OpenSCAD envelope (`cad/reference-bod
 - Arbitrary shopping-site 3D models
 - Unlicensed community STEP of T-Lion
 - Photos as “dimension truth” without measurement notes
+
+Such files may live under `3dprint/**/vendor/`, `3dprint/**/local/`, `_refs/`,
+or `docs/hardware/evidence/local/` (**gitignored**).
+
+Private **NAS backup still mirrors them** when present — see
+[`docs/backup/nas-policy.md`](../docs/backup/nas-policy.md).
+Backing up privately does **not** grant redistribution rights.

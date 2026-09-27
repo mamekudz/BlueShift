@@ -502,9 +502,9 @@ _Tag(backup, {
   gulpName: "backup",
   µDisplayName: 'Backup to NAS<context="µDisplayName"/>',
   µDescription:
-    'Copies BlueShift sources to up to three NAS folders. Zero targets is valid. Skips node_modules, .pio, secrets.<context="µDescription"/>',
+    'Copies BlueShift sources and valuable local/reference assets (incl. gitignored 3dprint/vendor CAD when present) to up to three NAS folders. Zero targets is valid. Skips node_modules, .pio, disposable caches, .env.<context="µDescription"/>',
   µTooltip:
-    'NAS_TARGET_1..3 / config/nas.targets.local / µGulp form. BLUESHIFT_NAS_DRY_RUN=1 for preview.<context="µTooltip"/>',
+    'NAS_TARGET_1..3 / config/nas.targets.local / µGulp form. BLUESHIFT_NAS_DRY_RUN=1 for preview. Gitignore ≠ NAS policy — see docs/backup/nas-policy.md.<context="µTooltip"/>',
   µGroup: 'Backup<context="µGroup"/>',
   µIcon: "\uE902",
   µOrder: 30,

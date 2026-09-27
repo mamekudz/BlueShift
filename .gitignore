@@ -41,9 +41,29 @@ settings_private.*
 Thumbs.db
 desktop.ini
 
-# Local refs / vendor dumps (not project source)
+# Local refs / vendor dumps (NOT Git — YES private NAS backup)
+# See docs/backup/nas-policy.md — gitignore ≠ NAS policy.
 *_refs
 _refs/
+_physical/
+
+# Local / vendor mechanical assets under 3dprint (NAS-backed; redistribution often unclear)
+3dprint/**/vendor/
+3dprint/**/local/
+3dprint/cad/step/**
+!3dprint/cad/step/README.md
+3dprint/cad/parasolid/**
+!3dprint/cad/parasolid/README.md
+3dprint/plasticity/**
+!3dprint/plasticity/README.md
+3dprint/printable/**
+!3dprint/printable/README.md
+3dprint/prototypes/**
+!3dprint/prototypes/README.md
+*.plasticity
+
+# Non-redistributable hardware evidence drops (tracked evidence stays in evidence/)
+docs/hardware/evidence/local/
 
 # Transient logs
 *_log.txt
@@ -51,6 +71,9 @@ build_log.txt
 upload_log.txt
 monitor_log.txt
 pkg_install_log.txt
+
+# Verified release artifacts may live in releases/ (Git policy separate; NAS-backed)
+# Do not put transient .pio/build output here.
 
 # ESP-IDF / PlatformIO generated sdkconfig (per-env + defaults copy)
 sdkconfig

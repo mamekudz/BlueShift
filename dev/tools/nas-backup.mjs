@@ -1,6 +1,16 @@
 // ===========================================
 // nas-backup.mjs — up to 3 NAS destinations for BlueShift
 // ===========================================
+//
+// Permanent principle:
+//   GIT eligibility, NAS backup eligibility, and redistribution permission
+//   are THREE INDEPENDENT properties.
+//
+// .gitignore protects the repository.
+// NAS backup protects the working environment and valuable local assets.
+// Do NOT use .gitignore as the NAS include/exclude policy.
+//
+// Policy: explicit include lists (not "git ls-files", not "everything not ignored").
 
 import { spawn } from "node:child_process";
 import {
@@ -16,7 +26,35 @@ import { dirname, join, resolve } from "node:path";
 
 export const NAS_BACKUP_MAX_DESTINATIONS = 3;
 
-/** Non-reproducible trees (µGulp / Watchy / esp2 selective-backup convention). */
+/**
+ * Asset class labels for BACKUP_MANIFEST.json (private; not published).
+ * @typedef {'SOURCE'|'LOCAL_REFERENCE'|'HARDWARE_EVIDENCE'|'CAD_SOURCE'|'USER_PRIVATE'|'VERIFIED_ARTIFACT'} NasAssetClass
+ */
+
+/** Disposable / regenerable trees — never NAS-backed. */
+export const NAS_BACKUP_EXCLUDE_DIRS = Object.freeze([
+  "node_modules",
+  ".pio",
+  ".cache",
+  ".microgulp",
+  "tmp",
+  "temp",
+  "__pycache__",
+]);
+
+/** Disposable / secret filenames — never NAS-backed. */
+export const NAS_BACKUP_EXCLUDE_FILES = Object.freeze([
+  "Thumbs.db",
+  ".DS_Store",
+  "desktop.ini",
+  "compile_commands.json",
+  ".env",
+]);
+
+/**
+ * Explicit project trees to mirror.
+ * Includes gitignored content inside these trees (vendor STEP, Plasticity, etc.).
+ */
 export const NAS_BACKUP_INCLUDE_DIRS = Object.freeze([
   "src",
   "include",
@@ -27,6 +65,12 @@ export const NAS_BACKUP_INCLUDE_DIRS = Object.freeze([
   "config",
   "test",
   "3dprint",
+  "spike",
+  "partitions",
+  "sdkconfig.d",
+  "_refs",
+  "_physical",
+  "releases",
   ".git",
 ]);
 
@@ -43,27 +87,10 @@ export const NAS_BACKUP_INCLUDE_FILES = Object.freeze([
   ".gitignore",
   ".editorconfig",
   ".clang-format",
+  "CMakeLists.txt",
 ]);
 
-export const NAS_BACKUP_EXCLUDE_DIRS = Object.freeze([
-  "node_modules",
-  ".pio",
-  ".cache",
-  ".microgulp",
-  "_refs",
-  "tmp",
-  "temp",
-]);
-
-export const NAS_BACKUP_EXCLUDE_FILES = Object.freeze([
-  "Thumbs.db",
-  ".DS_Store",
-  "desktop.ini",
-  "compile_commands.json",
-  "nas.targets.local",
-  ".env",
-]);
-
+/** Relative paths that must exist after a successful backup for verify. */
 export const NAS_BACKUP_REQUIRED_RELATIVE = Object.freeze([
   "CLAUDE.md",
   "platformio.ini",
@@ -71,7 +98,55 @@ export const NAS_BACKUP_REQUIRED_RELATIVE = Object.freeze([
   "gulpfile.mjs",
   "src/main.cpp",
   "docs/compatibility/devices.json",
+  "3dprint/ENCLOSURE-SPEC.md",
 ]);
+
+/**
+ * Classification hints for the private manifest (path prefix → class).
+ * First match wins.
+ */
+export const NAS_BACKUP_CLASS_RULES = Object.freeze([
+  { prefix: "_refs/", className: "LOCAL_REFERENCE" },
+  { prefix: "_physical/", className: "USER_PRIVATE" },
+  { prefix: "releases/", className: "VERIFIED_ARTIFACT" },
+  { prefix: "docs/hardware/evidence/", className: "HARDWARE_EVIDENCE" },
+  { prefix: "3dprint/", className: "CAD_SOURCE" },
+  { prefix: "config/", className: "USER_PRIVATE" },
+  { prefix: ".git/", className: "SOURCE" },
+]);
+
+/**
+ * @param {string} _relPosix
+ * @returns {NasAssetClass}
+ */
+export function ClassifyBackupRelativePath(_relPosix) {
+  const rel = String(_relPosix ?? "").replace(/\\/g, "/");
+  for (const rule of NAS_BACKUP_CLASS_RULES) {
+    if (rel === rule.prefix.slice(0, -1) || rel.startsWith(rule.prefix)) {
+      return /** @type {NasAssetClass} */ (rule.className);
+    }
+  }
+  return "SOURCE";
+}
+
+/**
+ * Independent property model (documentation helper for tests/docs).
+ */
+export const NAS_VS_GIT_POLICY = Object.freeze({
+  principle:
+    "GIT_TRACKED, NAS_BACKED_UP, and REDISTRIBUTABLE are independent properties.",
+  gitignoreIsNotNasPolicy: true,
+  valuableLocalAssets: {
+    GIT_TRACKED: "NO when redistribution unclear",
+    NAS_BACKED_UP: "YES",
+    REDISTRIBUTABLE: "UNKNOWN/NO until audited",
+  },
+  disposableBuild: {
+    GIT_TRACKED: "NO",
+    NAS_BACKED_UP: "NO",
+    examples: ["node_modules/", ".pio/", ".cache/", "tmp/", "temp/"],
+  },
+});
 
 /**
  * @param {Iterable<string>} _paths
@@ -303,6 +378,103 @@ function _CopyTree(_src, _dest, _opts) {
 }
 
 /**
+ * Walk included trees and collect relative paths for classification (private).
+ * @param {string} _sourceResolved
+ * @returns {string[]} posix-relative paths
+ */
+export function ListNasBackupRelativePaths(_sourceResolved) {
+  /** @type {string[]} */
+  const out = [];
+  const excludeDirs = new Set(NAS_BACKUP_EXCLUDE_DIRS);
+
+  /**
+   * @param {string} abs
+   * @param {string} relPosix
+   */
+  function walk(abs, relPosix) {
+    if (!existsSync(abs)) return;
+    const st = statSync(abs);
+    if (st.isFile()) {
+      out.push(relPosix);
+      return;
+    }
+    for (const name of readdirSync(abs)) {
+      if (excludeDirs.has(name)) continue;
+      if (NAS_BACKUP_EXCLUDE_FILES.includes(name)) continue;
+      const childRel = relPosix ? `${relPosix}/${name}` : name;
+      walk(join(abs, name), childRel.replace(/\\/g, "/"));
+    }
+  }
+
+  for (const rel of NAS_BACKUP_INCLUDE_DIRS) {
+    walk(join(_sourceResolved, rel), rel.replace(/\\/g, "/"));
+  }
+  for (const rel of NAS_BACKUP_INCLUDE_FILES) {
+    const abs = join(_sourceResolved, rel);
+    if (existsSync(abs) && statSync(abs).isFile()) {
+      out.push(rel.replace(/\\/g, "/"));
+    }
+  }
+  return out;
+}
+
+/**
+ * @param {string[]} _relPaths
+ */
+export function BuildCategorySummary(_relPaths) {
+  /** @type {Record<string, number>} */
+  const counts = {
+    SOURCE: 0,
+    LOCAL_REFERENCE: 0,
+    HARDWARE_EVIDENCE: 0,
+    CAD_SOURCE: 0,
+    USER_PRIVATE: 0,
+    VERIFIED_ARTIFACT: 0,
+  };
+  for (const rel of _relPaths) {
+    const c = ClassifyBackupRelativePath(rel);
+    counts[c] = (counts[c] ?? 0) + 1;
+  }
+  return counts;
+}
+
+/**
+ * Write private BACKUP_MANIFEST.json (not for publication).
+ * @param {string} _sourceResolved
+ * @param {string} _destResolved
+ * @param {string[]} [_relPaths]
+ */
+export function WriteBackupManifest(_sourceResolved, _destResolved, _relPaths) {
+  const paths = _relPaths ?? ListNasBackupRelativePaths(_sourceResolved);
+  const manifest = {
+    project: "BlueShift",
+    package: "blueshift",
+    createdAt: new Date().toISOString(),
+    source: _sourceResolved,
+    destination: _destResolved,
+    policy: {
+      ...NAS_VS_GIT_POLICY,
+      note: "Private manifest — do not publish automatically.",
+    },
+    includeDirs: [...NAS_BACKUP_INCLUDE_DIRS],
+    includeFiles: [...NAS_BACKUP_INCLUDE_FILES],
+    excludeDirs: [...NAS_BACKUP_EXCLUDE_DIRS],
+    excludeFiles: [...NAS_BACKUP_EXCLUDE_FILES],
+    categoryCounts: BuildCategorySummary(paths),
+    fileCount: paths.length,
+  };
+  writeFileSync(
+    join(_destResolved, "BACKUP_MANIFEST.json"),
+    JSON.stringify(manifest, null, 2) + "\n",
+    "utf8"
+  );
+  return manifest;
+}
+
+/**
+ * Mirror project trees to a NAS destination.
+ * Copies gitignored files inside include dirs (vendor STEP, Plasticity, etc.).
+ *
  * @param {string} _sourceResolved
  * @param {string} _destResolved
  * @param {boolean} _dryRun
@@ -354,21 +526,7 @@ export async function MirrorNonReproducible(
     }
 
     if (!_dryRun) {
-      const manifest = {
-        project: "BlueShift",
-        package: "blueshift",
-        createdAt: new Date().toISOString(),
-        source: _sourceResolved,
-        destination: _destResolved,
-        includeDirs: [...NAS_BACKUP_INCLUDE_DIRS],
-        includeFiles: [...NAS_BACKUP_INCLUDE_FILES],
-        excludeDirs: [...NAS_BACKUP_EXCLUDE_DIRS],
-      };
-      writeFileSync(
-        join(_destResolved, "BACKUP_MANIFEST.json"),
-        JSON.stringify(manifest, null, 2) + "\n",
-        "utf8"
-      );
+      WriteBackupManifest(_sourceResolved, _destResolved);
     }
     return lastExit;
   }
@@ -387,7 +545,44 @@ export async function MirrorNonReproducible(
     if (!existsSync(src)) continue;
     files += _CopyTree(src, join(_destResolved, rel), { dryRun: _dryRun });
   }
+  if (!_dryRun) {
+    WriteBackupManifest(_sourceResolved, _destResolved);
+  }
   return files;
+}
+
+/**
+ * Restore selected trees from a NAS backup into the project root.
+ * Intentionally gitignored files remain untracked after restore.
+ *
+ * @param {string} _backupRoot
+ * @param {string} _projectRoot
+ * @param {{ dryRun?: boolean, trees?: string[] }} [_opts]
+ */
+export function RestoreNasTrees(_backupRoot, _projectRoot, _opts = {}) {
+  const trees = _opts.trees ?? [
+    "3dprint",
+    "_refs",
+    "_physical",
+    "docs/hardware/evidence",
+    "releases",
+  ];
+  const dryRun = _opts.dryRun === true;
+  /** @type {string[]} */
+  const restored = [];
+  for (const rel of trees) {
+    const src = join(_backupRoot, rel);
+    if (!existsSync(src)) continue;
+    const dest = join(_projectRoot, rel);
+    if (!dryRun) {
+      _CopyTree(src, dest, {
+        dryRun: false,
+        excludeDirs: new Set(NAS_BACKUP_EXCLUDE_DIRS),
+      });
+    }
+    restored.push(rel.replace(/\\/g, "/"));
+  }
+  return { restored, dryRun };
 }
 
 /**
@@ -399,4 +594,12 @@ export function VerifyBackupContents(_backupRoot) {
     if (!existsSync(join(_backupRoot, rel))) missing.push(rel);
   }
   return { ok: missing.length === 0, missing };
+}
+
+/**
+ * True if a directory name is treated as disposable for NAS.
+ * @param {string} _name
+ */
+export function IsNasDisposableDirName(_name) {
+  return NAS_BACKUP_EXCLUDE_DIRS.includes(_name);
 }
