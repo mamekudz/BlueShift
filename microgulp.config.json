@@ -1,0 +1,14 @@
+{
+	"gulpfile": "gulpfile.mjs",
+	"preload": true,
+	"watchGulpfiles": true,
+	"metadataWatchFiles": [
+		"package.json",
+		"RELEASES.json"
+	],
+	"project": {
+		"title": "BlueShift™",
+		"description": "Classic Bluetooth → BLE HID bridge",
+		"logo": "./docs/assets/blueshift-logo.svg"
+	}
+}

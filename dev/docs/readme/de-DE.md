@@ -3,7 +3,11 @@
 [English](README.md) | **Deutsch**
 
 <p align="center">
-  <img src="docs/assets/blueshift-logo.png" alt="BlueShift" width="420">
+  <img src="docs/assets/blueshift-logo.svg" alt="BlueShift-Marke" width="160">
+</p>
+
+<p align="center">
+  <img src="docs/assets/blueshift-logo-name.svg" alt="BlueShift™" width="420">
 </p>
 
 <p align="center">
@@ -290,5 +294,4 @@ Marken-/Logo-Rechte sind von der Softwarelizenz getrennt; siehe
 Wortmarke: **BlueShift™** (nicht ®). Grafisches Logo: Entwurf —
 Markenbehandlung **UNDECIDED**.
 
-BlueShift-Logo-Entwurf: `docs/assets/blueshift-logo.png` (Vollfarbe; OLED-Mono
-später separat) — kein automatisches Markenrecht für kommerzielle Produkte.
+BlueShift-Logo-Entwürfe: Marke `docs/assets/blueshift-logo.svg` (aus `dev/drafts/logo.svg`) und Schriftzug `docs/assets/blueshift-logo-name.svg` (aus `dev/drafts/logo_only_name.svg`); OLED-Mono später separat — kein automatisches Markenrecht für kommerzielle Produkte.

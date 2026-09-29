@@ -721,18 +721,151 @@ Task display names use en-US keys + `i18x/gulp/{en-US,de-DE}.json` and `V<versio
 
 Root `RELEASES.json` is the canonical consolidated BlueShift project history.
 
-Contributor notes live in `dev/releases/*.json` (en-US authoring).
+Contributor notes live in `dev/releases/<developer>.json` (example:
+`dev/releases/MAM.json`) to avoid merge conflicts during team development.
 
-`releases:update` merges contributor entries that are:
+Current µGulp helpers (`releases:update`, `releases:history`) and
+`docs/releases/README.md` exist; the rules below are the **permanent
+architecture** for RELEASES + i18x. Do not invent a second localization store.
 
-- newer than 30 days, and
-- not already present (fingerprint = version + stripped info text)
 
-Tooling owns `<context="release info"/>` normalization.
+### Source language (permanent)
 
-`releases:history` shows localized readable history — not a raw JSON dump.
+The canonical source language for release information is ALWAYS **en-US**.
 
-Details: `docs/releases/README.md`.
+This applies to:
+
+- `RELEASES.json`
+- `dev/releases/*.json`
+- all future release-information source data
+
+Do **not** author parallel translated RELEASES source files.
+Translations belong to the existing BlueShift **i18x** system (§58).
+
+`RELEASES.json` itself remains canonical **en-US** source.
+Do **not** transform it into a multilingual data store.
+
+Localized release history is produced through existing i18x infrastructure
+using: en-US source string + `<context="release info"/>`.
+
+
+### Release-info context tag (permanent)
+
+Every **user-visible / translatable** release-information source string must
+carry exactly one:
+
+    <context="release info"/>
+
+This identifies the string for the existing i18x pipeline.
+
+The rule applies not only to the main description. It also applies to
+user-visible/translatable string properties inside `info` (and nested
+structures where applicable), including conceptually:
+
+- title
+- description
+- status text
+- explanatory text
+- user-visible labels
+
+Do **not** add release-info context to non-translatable machine/identity data,
+for example:
+
+- version numbers
+- dates
+- commit hashes / SHA hashes
+- URLs / file paths
+- technical IDs / protocol UUIDs
+- numeric values
+- hardware identifiers such as `ESP32-WROVER`
+
+Distinction:
+
+    user-visible natural-language text  →  translatable (context tag)
+    machine-readable / identity value   →  not translated
+
+
+### Context normalization (permanent, idempotent)
+
+Before release information enters the i18x pipeline:
+
+1. existing equivalent release-info context tags are normalized/removed
+2. exactly one canonical `<context="release info"/>` is applied
+
+This operation **must be idempotent**. Repeated runs must never accumulate
+duplicate context tags.
+
+Future RELEASES processing must be deterministic and idempotent overall:
+if source data has not changed, a second processing run → **zero diff**
+(including context normalization).
+
+
+### Contributor merge (intended)
+
+When contributor files are consolidated into `RELEASES.json`:
+
+- consider entries **newer than 30 days**
+- add only entries **not already present** in `RELEASES.json`
+
+The merge must be deterministic, duplicate-safe, and idempotent
+(fingerprint identity — not array position).
+
+
+### Development vs translation (permanent policy)
+
+During **normal development**:
+
+- release source is authored in en-US
+- context tags are maintained/normalized
+- missing translations are **not** automatically generated merely because a
+  developer adds or edits a release entry
+- do **not** trigger AI translation during ordinary development
+
+Translation generation occurs only:
+
+- on **explicit** user/developer command, or
+- as part of the **pre-publication / release** process
+
+Only missing/stale translations should be processed.
+Existing valid translations must not be blindly regenerated.
+
+
+### Pre-publication safety net (future mandatory)
+
+Before publication:
+
+1. validate all translatable RELEASES source strings
+2. ensure each has exactly one `<context="release info"/>`
+3. if a tag is missing — add/fix it automatically, then validate again
+4. only then: i18x completeness check → missing/stale translations →
+   final validation → publication
+
+
+### Context CHECK vs FIX (architecture only)
+
+Intended conceptual separation (do not invent a second system; tasks may be
+wired later under µGulp without changing this document’s intent):
+
+    context CHECK
+        → detects missing / invalid / duplicate release-info context
+        → does not modify files
+
+    context FIX
+        → normalizes / removes equivalent old tags
+        → adds exactly one canonical tag
+
+Future µGulp integration will provide, at architectural level:
+
+- release-history processing
+- context check/fix
+- translation completeness
+- readable current history
+
+Do not specify technical task IDs here beyond existing helpers already listed
+in §83.
+
+
+Details of the present helper workflow: `docs/releases/README.md`.
 
 
 ## 84. Git Backup

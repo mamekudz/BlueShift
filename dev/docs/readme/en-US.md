@@ -3,7 +3,11 @@
 **English** | [Deutsch](README.de-DE.md)
 
 <p align="center">
-  <img src="docs/assets/blueshift-logo.png" alt="BlueShift" width="420">
+  <img src="docs/assets/blueshift-logo.svg" alt="BlueShift mark" width="160">
+</p>
+
+<p align="center">
+  <img src="docs/assets/blueshift-logo-name.svg" alt="BlueShift™" width="420">
 </p>
 
 <p align="center">
@@ -286,4 +290,4 @@ Trademark / logo rights are separate from the software license; see
 
 Word mark: **BlueShift™** (not ®). Graphic logo: draft — trademark treatment **UNDECIDED**.
 
-BlueShift logo draft: `docs/assets/blueshift-logo.png` (full color; OLED mono later separately) — no automatic trademark rights for commercial products.
+BlueShift logo drafts: mark `docs/assets/blueshift-logo.svg` (from `dev/drafts/logo.svg`) and wordmark `docs/assets/blueshift-logo-name.svg` (from `dev/drafts/logo_only_name.svg`); OLED mono later separately — no automatic trademark rights for commercial products.

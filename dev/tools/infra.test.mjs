@@ -105,14 +105,11 @@ test("readme filter strips note/website and is deterministic", () => {
 
 test("µGulp groups are Firmware / Tools / Docs / Release / Git / Backup", async () => {
   const mod = await import("../../gulpfile.mjs");
-  assert.ok(mod.µGroups?.groups);
-  const keys = Object.keys(mod.µGroups.groups).map((k) =>
-    k.replace(/<context="µGroup"\/>/g, "").trim()
+  assert.equal(
+    mod.µGroups,
+    "collapsed",
+    "dashboard groups should start collapsed"
   );
-  for (const need of ["Firmware", "Tools", "Docs", "Release", "Git", "Backup"]) {
-    assert.ok(keys.includes(need), `missing group ${need}: ${keys.join(",")}`);
-  }
-  assert.equal(keys.includes("Docs & Quality"), false);
   assert.equal(mod.BACKUP_NAS, undefined, "NAS alias must not be a dashboard export");
 
   const groupOf = (fn) =>
@@ -123,6 +120,7 @@ test("µGulp groups are Firmware / Tools / Docs / Release / Git / Backup", async
   assert.equal(groupOf(mod.RELEASES_UPDATE), "Release");
   assert.equal(groupOf(mod.BACKUP_GIT), "Git");
   assert.equal(groupOf(mod.backup), "Backup");
+  assert.notEqual(groupOf(mod.docs), "Docs & Quality");
 
   const nameOf = (fn) =>
     typeof fn["\u00b5DisplayName"] === "function"
@@ -170,7 +168,8 @@ test("ComposeReadme injects compatibility table and is idempotent", () => {
   for (const readme of [readmeEn, readmeDe]) {
     assert.match(readme, /BlueShift/);
     assert.match(readme, /microgulp-ready\.png/);
-    assert.match(readme, /blueshift-logo\.png/);
+    assert.match(readme, /blueshift-logo-name\.svg/);
+    assert.match(readme, /blueshift-logo\.svg/);
     assert.match(readme, /## µGulp-ready/);
     assert.match(readme, /Work in Progress/);
     assert.doesNotMatch(readme, new RegExp(COMPAT_TABLE_MARKER));

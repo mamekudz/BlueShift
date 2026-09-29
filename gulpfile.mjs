@@ -75,18 +75,8 @@ export const µI18xContext = {
   version: GetProjectVersionLabel(rootDir),
 };
 
-/** Dashboard start layout for µGroup sections. */
-export const µGroups = {
-  collapsed: false,
-  groups: {
-    'Firmware<context="µGroup"/>': "open",
-    'Tools<context="µGroup"/>': "open",
-    'Docs<context="µGroup"/>': "collapsed",
-    'Release<context="µGroup"/>': "open",
-    'Git<context="µGroup"/>': "open",
-    'Backup<context="µGroup"/>': "open",
-  },
-};
+/** Dashboard start layout: all µGroup sections start collapsed. */
+export const µGroups = "collapsed";
 
 /**
  * @param {Function} _task
